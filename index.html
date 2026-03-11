@@ -100,13 +100,21 @@
 
 <script>
 const PROXY = '/api/ampeco';
+// Date helpers
+const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth()+1).padStart(2,'0');
+const firstOfMonth = `${yyyy}-${mm}-01`;
+const thirtyDaysAgo = new Date(today - 30*24*60*60*1000).toISOString().slice(0,10);
+
 const ENDPOINTS = {
-  locations:    '/resources/locations/v1.0',
-  chargePoints: '/resources/charge-points/v1.0',
-  sessions:     '/resources/sessions/v1.0',
-  users:        '/resources/users/v1.0',
-  transactions: '/resources/transactions/v1.0',
-  evses:        '/resources/evses/v1.0',
+  locations:      '/resources/locations/v1.0',
+  chargePoints:   '/resources/charge-points/v1.0',
+  activeSessions: `/resources/sessions/v1.0?filter[status][]=active&filter[status][]=pending`,
+  recentSessions: `/resources/sessions/v1.0?filter[startedAt][from]=${thirtyDaysAgo}`,
+  users:          '/resources/users/v1.0',
+  transactions:   `/resources/transactions/v1.0?filter[createdAt][from]=${firstOfMonth}`,
+  evses:          '/resources/evses/v1.0',
 };
 
 let allData = null;
@@ -184,8 +192,8 @@ async function loadAll() {
 
         const lastPage = json.meta?.last_page ?? 1;
         let all = [...items];
-        for (let p = 2; p <= Math.min(lastPage, 25); p++) {
-          setLoading(`Fetching ${key} page ${p}/${Math.min(lastPage,25)}...`);
+        for (let p = 2; p <= lastPage; p++) {
+          setLoading(`Fetching ${key} page ${p}/${lastPage}...`);
           const r = await fetch(`${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=${p}`);
           const j = await r.json();
           all = [...all, ...(j.data ?? j.items ?? [])];
@@ -221,13 +229,13 @@ async function loadAll() {
 function setLoading(msg) { document.getElementById('loadingMsg').textContent = msg; }
 
 const TABS = [
-  { key:'overview', label:'Overview' },
-  { key:'chargepoints', label:'Charge Points', dk:'chargePoints' },
-  { key:'evses', label:'EVSEs', dk:'evses' },
-  { key:'sessions', label:'Sessions', dk:'sessions' },
-  { key:'locations', label:'Locations', dk:'locations' },
-  { key:'users', label:'Users', dk:'users' },
-  { key:'transactions', label:'Transactions', dk:'transactions' },
+  { key:'overview',      label:'Overview' },
+  { key:'chargepoints',  label:'Charge Points',  dk:'chargePoints' },
+  { key:'evses',         label:'EVSEs',          dk:'evses' },
+  { key:'sessions',      label:'Sessions (30d)',  dk:'recentSessions' },
+  { key:'locations',     label:'Locations',      dk:'locations' },
+  { key:'users',         label:'Users',          dk:'users' },
+  { key:'transactions',  label:'Transactions',   dk:'transactions' },
 ];
 
 function buildTabs() {
@@ -257,13 +265,13 @@ function filterArr(arr, fields) {
 
 function renderTab() {
   const el = document.getElementById('tabContent');
-  const { chargePoints:cp=[], locations:locs=[], sessions:sess=[], users:usrs=[], transactions:txns=[], evses=[] } = allData || {};
+      const { chargePoints:cp=[], locations:locs=[], activeSessions:activeSess=[], recentSessions:sess=[], users:usrs=[], transactions:txns=[], evses=[] } = allData || {};
 
   if (currentTab === 'overview') {
     const cpOnline = cp.filter(c => ['online','available','charging'].includes((c.connectivity_status||c.status||'').toLowerCase())).length;
-    const activeSess = sess.filter(s => ['charging','active'].includes((s.status||'').toLowerCase())).length;
-    const totalEnergy = sess.reduce((a,s) => a+parseFloat(s.kwh||s.energy||0), 0);
-    const totalRev = txns.reduce((a,t) => a+parseFloat(t.amount||t.total||0), 0);
+    const activeSess = sess.filter(s => ['charging','active','pending'].includes((s.status||'').toLowerCase())).length;
+    const totalEnergy = sess.reduce((a,s) => a + parseFloat(s.energy||s.kwh||0), 0) / 1000; // energy is in Wh
+    const totalRev = sess.reduce((a,s) => a + parseFloat(s.amount||s.total_cost||s.cost||0), 0);
 
     const statusCounts = cp.reduce((a,c) => { const s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; }, {});
 
@@ -271,9 +279,9 @@ function renderTab() {
       <div class="cards">
         <div class="card"><div class="card-icon">🔌</div><div class="card-label">Charge Points</div><div class="card-value" style="color:#00c2a8">${cp.length.toLocaleString()}</div><div class="card-sub">${cpOnline} active</div></div>
         <div class="card"><div class="card-icon">📍</div><div class="card-label">Locations</div><div class="card-value" style="color:#3b82f6">${locs.length.toLocaleString()}</div></div>
-        <div class="card"><div class="card-icon">⚡</div><div class="card-label">Active Sessions</div><div class="card-value" style="color:#a78bfa">${activeSess}</div></div>
-        <div class="card"><div class="card-icon">🔋</div><div class="card-label">Energy (kWh)</div><div class="card-value" style="color:#f59e0b">${totalEnergy.toFixed(1)}</div></div>
-        <div class="card"><div class="card-icon">💰</div><div class="card-label">Revenue</div><div class="card-value" style="color:#10b981">$${totalRev.toFixed(2)}</div></div>
+        <div class="card"><div class="card-icon">⚡</div><div class="card-label">Active Sessions</div><div class="card-value" style="color:#a78bfa">${activeSess.length}</div></div>
+        <div class="card"><div class="card-icon">🔋</div><div class="card-label">Energy This Month (kWh)</div><div class="card-value" style="color:#f59e0b">${totalEnergy.toFixed(1)}</div></div>
+        <div class="card"><div class="card-icon">💰</div><div class="card-label">Revenue This Month</div><div class="card-value" style="color:#10b981">${totalRev.toFixed(2)}</div></div>
         <div class="card"><div class="card-icon">👤</div><div class="card-label">Users</div><div class="card-value" style="color:#f97316">${usrs.length.toLocaleString()}</div></div>
       </div>
       ${cp.length ? `<div class="section"><div class="section-title">Charge Point Status</div><div class="status-grid">${Object.entries(statusCounts).map(([s,cnt]) => `<div class="status-box">${badgeHtml(s)}<div class="status-num">${cnt}</div></div>`).join('')}</div></div>` : ''}
@@ -299,10 +307,13 @@ function renderTab() {
   }
 
   if (currentTab === 'sessions') {
-    const rows = filterArr(sess, ['id','status','charge_point_id','user_id']).slice(0,500).map(s =>
-      `<tr><td class="mono">${s.id}</td><td>${badgeHtml(s.status)}</td><td class="muted" style="font-size:12px">${fmt(s.started_at)}</td><td class="bold">${kwh(s.kwh||s.energy)}</td><td class="muted">${s.duration_seconds?Math.floor(s.duration_seconds/60)+'m':'–'}</td><td class="muted">${s.charge_point_id||'–'}</td><td class="muted">${s.user_id||'–'}</td></tr>`
+    const allSess = [...(allData.activeSessions||[]), ...(allData.recentSessions||[])];
+    const seen = new Set(); 
+    const deduped = allSess.filter(s => seen.has(s.id) ? false : seen.add(s.id));
+    const rows = filterArr(deduped, ['id','status','chargePointId','userId']).slice(0,500).map(s =>
+      `<tr><td class="mono">${s.id}</td><td>${badgeHtml(s.status)}</td><td class="muted" style="font-size:12px">${fmt(s.startedAt)}</td><td class="bold">${(parseFloat(s.energy||0)/1000).toFixed(2)}</td><td class="muted">${s.stoppedAt&&s.startedAt?Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m':'–'}</td><td class="muted">${s.chargePointId||'–'}</td><td class="muted">${s.userId||'–'}</td><td class="green">${money(s.amount)}</td></tr>`
     ).join('');
-    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Status</th><th>Started</th><th>kWh</th><th>Duration</th><th>Charge Point</th><th>User</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="empty">No sessions</td></tr>'}</tbody></table></div>`;
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Status</th><th>Started</th><th>kWh</th><th>Duration</th><th>Charge Point</th><th>User</th><th>Amount</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">No sessions</td></tr>'}</tbody></table></div>`;
     return;
   }
 
