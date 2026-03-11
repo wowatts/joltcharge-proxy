@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+
+// api/ampeco.js
+module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -7,10 +9,14 @@ export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
   const { path, ...query } = req.query;
-  if (!path) return res.status(400).json({ error: "Missing ?path=" });
+  if (!path) return res.status(400).json({ error: "Missing ?path= parameter" });
 
   const AMPECO_KEY  = process.env.AMPECO_API_KEY;
   const AMPECO_BASE = process.env.AMPECO_BASE_URL;
+
+  if (!AMPECO_KEY || !AMPECO_BASE) {
+    return res.status(500).json({ error: "Missing env vars: AMPECO_API_KEY or AMPECO_BASE_URL" });
+  }
 
   const qs = new URLSearchParams(query).toString();
   const url = `${AMPECO_BASE}${path}${qs ? "?" + qs : ""}`;
@@ -23,9 +29,8 @@ export default async function handler(req, res) {
       },
     });
     const data = await upstream.json();
-    res.status(upstream.status).json(data);
+    return res.status(upstream.status).json(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message, url });
   }
-}
-```
+};
