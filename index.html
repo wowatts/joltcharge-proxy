@@ -308,7 +308,7 @@ function finishLoad() {
     document.getElementById('loadBtn').disabled = false;
     document.getElementById('loadBtn').textContent = '🔄 Refresh';
     document.getElementById('errorEl').style.display = 'block';
-    document.getElementById('errorEl').textContent = '⚠️ UI error in finishLoad: ' + e.message + '\n' + e.stack;
+    document.getElementById('errorEl').textContent = '⚠️ UI error in finishLoad: ' + e.message;
     console.error('finishLoad error:', e);
   }
 }
