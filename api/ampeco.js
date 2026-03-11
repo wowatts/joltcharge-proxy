@@ -19,7 +19,8 @@ module.exports = async function handler(req, res) {
   }
 
   const qs = new URLSearchParams(query).toString();
-  const url = `${AMPECO_BASE}${path}${qs ? "?" + qs : ""}`;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${AMPECO_BASE}${normalizedPath}${qs ? "?" + qs : ""}`;
 
   try {
     const upstream = await fetch(url, {
