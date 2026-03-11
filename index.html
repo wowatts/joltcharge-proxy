@@ -7,13 +7,13 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0d1117; color: #e2e8f0; font-family: system-ui, sans-serif; padding: 20px; min-height: 100vh; }
-  h1 { font-size: 20px; font-weight: 700; }
-  .subtitle { color: #4b5563; font-size: 12px; margin-top: 2px; }
   .header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
   .logo { background: #00c2a8; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .btn { background: #00c2a8; color: #0d1117; border: none; border-radius: 9px; padding: 8px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost { background: #1a1f2e; color: #8892a4; border: 1px solid #2d3748; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+  .month-select { background: #1a1f2e; color: #e2e8f0; border: 1px solid #2d3748; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
   .badge { background: #00c2a818; color: #00c2a8; border: 1px solid #00c2a840; border-radius: 8px; padding: 4px 12px; font-size: 12px; }
   .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
   .tab { background: transparent; color: #8892a4; border: none; border-radius: 8px; padding: 7px 14px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -49,16 +49,23 @@
   .status-num { font-weight: 700; font-size: 22px; margin-top: 6px; }
   .section { background: #1a1f2e; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
   .section-title { font-weight: 600; margin-bottom: 14px; }
-  .spinner { text-align: center; padding: 60px; color: #8892a4; }
+  .progress-bar { background: #1a1f2e; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .progress-title { font-weight: 600; margin-bottom: 16px; color: #e2e8f0; }
+  .progress-item { margin-bottom: 14px; }
+  .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+  .progress-track { background: #0d1117; border-radius: 99px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 6px; border-radius: 99px; transition: width 0.5s; }
+  .empty { padding: 40px; text-align: center; color: #8892a4; }
+  .spinner { text-align: center; padding: 40px; color: #8892a4; }
   .spinner-icon { font-size: 36px; display: inline-block; animation: spin 1.2s linear infinite; }
   .spinner-msg { font-size: 14px; margin-top: 10px; }
-  .spinner-sub { font-size: 12px; color: #4b5563; margin-top: 6px; }
+  .spinner-sub { font-size: 12px; color: #4b5563; margin-top: 4px; }
+  .progress-log { margin-top: 12px; background: #0d1117; border-radius: 8px; padding: 10px 12px; max-height: 120px; overflow-y: auto; }
+  .log-line { font-family: monospace; font-size: 11px; color: #8892a4; margin-bottom: 2px; }
+  .log-ok { color: #00c2a8; }
+  .log-err { color: #ef4444; }
   .error { background: #ef444418; border: 1px solid #ef444440; border-radius: 10px; padding: 14px; color: #ef4444; margin-bottom: 16px; font-size: 13px; }
-  .empty { padding: 40px; text-align: center; color: #8892a4; }
-  .welcome { background: #1a1f2e; border-radius: 12px; padding: 50px; text-align: center; }
-  .welcome-icon { font-size: 48px; margin-bottom: 14px; }
-  .welcome-title { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
-  .welcome-sub { color: #8892a4; font-size: 14px; margin-bottom: 22px; }
+  .month-label { background: #1a1f2e; border-radius: 8px; padding: 4px 12px; font-size: 12px; color: #8892a4; border: 1px solid #2d3748; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -67,23 +74,25 @@
 <div class="header">
   <div class="logo">⚡</div>
   <div>
-    <h1>Ampeco Live Dashboard</h1>
-    <div class="subtitle">joltcharge-us.us.charge.ampeco.tech</div>
+    <div style="font-weight:700;font-size:20px">Ampeco Dashboard</div>
+    <div style="color:#4b5563;font-size:12px">joltcharge-us.us.charge.ampeco.tech</div>
   </div>
   <div class="header-right">
-    <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Live Data</button>
+    <select class="month-select" id="monthSelect" onchange="onMonthChange()"></select>
+    <button class="btn-ghost" id="clearCacheBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
+    <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Data</button>
     <span class="badge" id="statusBadge" style="display:none">🟢 <span id="recordCount">0</span> records</span>
   </div>
 </div>
 
+<div id="errorEl" style="display:none" class="error"></div>
+
 <div id="loadingEl" style="display:none" class="spinner">
   <div class="spinner-icon">⚡</div>
   <div class="spinner-msg" id="loadingMsg">Loading...</div>
-  <div class="spinner-sub">Fetching from Ampeco via proxy</div>
-  <div id="debugLog" style="margin-top:16px;background:#0d1117;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;text-align:left;min-height:60px;"></div>
+  <div class="spinner-sub" id="loadingSub"></div>
+  <div class="progress-log" id="debugLog"></div>
 </div>
-
-<div id="errorEl" style="display:none" class="error"></div>
 
 <div id="mainContent" style="display:none">
   <div class="tabs" id="tabs"></div>
@@ -91,151 +100,226 @@
   <div id="tabContent"></div>
 </div>
 
-<div id="welcomeEl" class="welcome">
-  <div class="welcome-icon">⚡</div>
-  <div class="welcome-title">Ampeco Dashboard</div>
-  <div class="welcome-sub">Click "Load Live Data" to connect to your Ampeco instance and pull live data.</div>
-  <button class="btn" onclick="loadAll()">🔌 Load Live Data</button>
-</div>
-
 <script>
 const PROXY = '/api/ampeco';
-// Date helpers
-const today = new Date();
-const yyyy = today.getFullYear();
-const mm = String(today.getMonth()+1).padStart(2,'0');
-const firstOfMonth = `${yyyy}-${mm}-01`;
-const thirtyDaysAgo = new Date(today - 30*24*60*60*1000).toISOString().slice(0,10);
-
-const ENDPOINTS = {
-  locations:      '/resources/locations/v1.0',
-  chargePoints:   '/resources/charge-points/v1.0',
-  activeSessions: `/resources/sessions/v1.0?filter[status][]=active&filter[status][]=pending`,
-  recentSessions: `/resources/sessions/v1.0?filter[startedAt][from]=${thirtyDaysAgo}`,
-  users:          '/resources/users/v1.0',
-  transactions:   `/resources/transactions/v1.0?filter[createdAt][from]=${firstOfMonth}`,
-  evses:          '/resources/evses/v1.0',
-};
-
 let allData = null;
 let currentTab = 'overview';
 
-const n = v => { if (!v) return '–'; if (typeof v === 'string') return v; return v.en ?? v[Object.keys(v)[0]] ?? '–'; };
-const fmt = d => d ? new Date(d).toLocaleString() : '–';
-const fmtDate = d => d ? new Date(d).toLocaleDateString() : '–';
-const money = v => v != null ? `$${parseFloat(v).toFixed(2)}` : '–';
-const kwh = v => parseFloat(v || 0).toFixed(2);
-
-const STATUS_COLORS = { available:'#00c2a8', charging:'#3b82f6', faulted:'#ef4444', unavailable:'#f59e0b', preparing:'#a78bfa', finishing:'#06b6d4', reserved:'#f97316', online:'#00c2a8', offline:'#8892a4', active:'#3b82f6', completed:'#10b981', unknown:'#8892a4' };
-const badgeHtml = s => {
-  const k = (s||'unknown').toLowerCase();
-  const c = STATUS_COLORS[k] || '#8892a4';
-  return `<span class="badge-status" style="background:${c}22;color:${c};border:1px solid ${c}44">${s||'unknown'}</span>`;
-};
-
-async function proxyGet(path, page=1) {
-  const url = `${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=${page}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
-  return res.json();
-}
-
-async function fetchEndpoint(key, path) {
-  setLoading(`Fetching ${key}...`);
-  const first = await proxyGet(path, 1);
-  const items = first.data ?? first.items ?? (Array.isArray(first) ? first : []);
-  const lastPage = first.meta?.last_page ?? 1;
-  let all = [...items];
-  for (let p = 2; p <= Math.min(lastPage, 25); p++) {
-    setLoading(`Fetching ${key} page ${p}/${Math.min(lastPage,25)}...`);
-    const next = await proxyGet(path, p);
-    all = [...all, ...(next.data ?? next.items ?? [])];
+// ── Month selector ──────────────────────────────────────────────
+function buildMonthOptions() {
+  const sel = document.getElementById('monthSelect');
+  const now = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = label;
+    if (i === 0) opt.selected = true;
+    sel.appendChild(opt);
   }
-  return all;
 }
 
-function log(msg, color) {
+function getSelectedMonth() {
+  return document.getElementById('monthSelect').value; // "YYYY-MM"
+}
+
+function monthRange(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const from = `${ym}-01`;
+  const lastDay = new Date(y, m, 0).getDate();
+  const to = `${ym}-${String(lastDay).padStart(2,'0')}`;
+  return { from, to };
+}
+
+// ── Cache helpers ───────────────────────────────────────────────
+function isFinalizedMonth(ym) {
+  const now = new Date();
+  const current = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  return ym < current;
+}
+function cacheKey(ym) { return `ampeco_month_${ym}`; }
+
+function saveToCache(ym, data, lastFetchedAt) {
+  try {
+    localStorage.setItem(cacheKey(ym), JSON.stringify({ cachedAt: new Date().toISOString(), lastFetchedAt, data }));
+    log(`💾 Saved ${ym} to cache`, 'log-ok');
+  } catch(e) { log(`⚠️ Cache write failed: ${e.message}`); }
+}
+
+function loadFromCache(ym) {
+  try {
+    const raw = localStorage.getItem(cacheKey(ym));
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function clearCache(ym) {
+  localStorage.removeItem(cacheKey(ym));
+  log(`🗑️ Cleared cache for ${ym}`);
+}
+
+// Merge new records into existing array, dedup by id
+function mergeRecords(existing, incoming) {
+  const map = new Map(existing.map(r => [String(r.id), r]));
+  for (const r of incoming) map.set(String(r.id), r); // incoming overwrites (more recent)
+  return Array.from(map.values());
+}
+
+// Subtract 2h overlap from a timestamp string to catch late-arriving records
+function withOverlap(isoString, overlapHours = 2) {
+  const d = new Date(isoString);
+  d.setTime(d.getTime() - overlapHours * 3600 * 1000);
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+// ── Fetch helpers ───────────────────────────────────────────────
+function log(msg, cls) {
   const el = document.getElementById('debugLog');
-  const line = document.createElement('div');
-  line.style.color = color || '#8892a4';
-  line.style.fontSize = '12px';
-  line.style.fontFamily = 'monospace';
-  line.style.marginBottom = '2px';
-  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-  el.appendChild(line);
+  const d = document.createElement('div');
+  d.className = 'log-line' + (cls ? ' ' + cls : '');
+  d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(d);
   el.scrollTop = el.scrollHeight;
 }
 
+async function fetchPages(path, maxPages = 50) {
+  let all = [], page = 1, lastPage = 1;
+  do {
+    const sep = path.includes('?') ? '&' : '?';
+    const url = `${PROXY}?path=${encodeURIComponent(path + sep + `per_page=100&page=${page}`)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const items = json.data ?? json.items ?? (Array.isArray(json) ? json : []);
+    all = [...all, ...items];
+    lastPage = json.meta?.last_page ?? 1;
+    document.getElementById('loadingSub').textContent = `Page ${page}/${Math.min(lastPage, maxPages)}`;
+    page++;
+  } while (page <= lastPage && page <= maxPages);
+  return all;
+}
+
+// ── Main load ───────────────────────────────────────────────────
 async function loadAll() {
-  document.getElementById('welcomeEl').style.display = 'none';
+  const ym = getSelectedMonth();
+  const { from, to } = monthRange(ym);
+  const now = new Date().toISOString();
+
   document.getElementById('mainContent').style.display = 'none';
   document.getElementById('errorEl').style.display = 'none';
   document.getElementById('loadingEl').style.display = 'block';
   document.getElementById('debugLog').innerHTML = '';
   document.getElementById('loadBtn').disabled = true;
+  document.getElementById('statusBadge').style.display = 'none';
 
-  log('Starting load...', '#00c2a8');
-  log('Proxy URL: ' + window.location.origin + PROXY, '#4b5563');
+  const cached = loadFromCache(ym);
+  const isIncremental = !!cached;
+  const overlapFrom = cached?.lastFetchedAt ? withOverlap(cached.lastFetchedAt) : null;
 
-  try {
-    const data = {};
-    for (const [key, path] of Object.entries(ENDPOINTS)) {
-      try {
-        log(`Fetching ${key}...`);
-        const url = `${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=1`;
-        log(`  GET ${url}`, '#4b5563');
-        const res = await fetch(url);
-        log(`  Response status: ${res.status}`, res.ok ? '#00c2a8' : '#ef4444');
-        const json = await res.json();
-        const items = json.data ?? json.items ?? (Array.isArray(json) ? json : []);
-        log(`  Got ${items.length} items, last_page=${json.meta?.last_page ?? 1}`, '#00c2a8');
-
-        const lastPage = json.meta?.last_page ?? 1;
-        let all = [...items];
-        for (let p = 2; p <= lastPage; p++) {
-          setLoading(`Fetching ${key} page ${p}/${lastPage}...`);
-          const r = await fetch(`${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=${p}`);
-          const j = await r.json();
-          all = [...all, ...(j.data ?? j.items ?? [])];
-        }
-        data[key] = all;
-        log(`  ✅ ${key}: ${all.length} total records`, '#00c2a8');
-      } catch(e) {
-        log(`  ❌ ${key} failed: ${e.message}`, '#ef4444');
-        data[key] = [];
-      }
-    }
-    allData = data;
-    const total = Object.values(data).reduce((a,b) => a+b.length, 0);
-    log(`Done! Total: ${total} records`, '#00c2a8');
-    document.getElementById('recordCount').textContent = total.toLocaleString();
-    document.getElementById('statusBadge').style.display = '';
-    document.getElementById('loadingEl').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    document.getElementById('loadBtn').textContent = '🔄 Refresh';
-    document.getElementById('loadBtn').disabled = false;
-    buildTabs();
-    renderTab();
-  } catch(e) {
-    log('Fatal error: ' + e.message, '#ef4444');
-    document.getElementById('loadingEl').style.display = 'none';
-    document.getElementById('welcomeEl').style.display = 'block';
-    document.getElementById('errorEl').style.display = 'block';
-    document.getElementById('errorEl').textContent = '⚠️ ' + e.message;
-    document.getElementById('loadBtn').disabled = false;
+  if (isIncremental) {
+    const age = Math.round((Date.now() - new Date(cached.cachedAt)) / 60000);
+    log(`📦 Cache found for ${ym} (${age < 60 ? age+'m' : Math.round(age/60)+'h'} old) — incremental update from ${overlapFrom}`, 'log-ok');
+  } else {
+    log(`🆕 No cache for ${ym} — full fetch`, 'log-ok');
   }
+
+  // Start with cached data or empty
+  const data = isIncremental ? { ...cached.data } : {
+    locations: [], chargePoints: [], evses: [],
+    sessions: [], transactions: [], users: [], activeSessions: []
+  };
+
+  // Always-live endpoints (never cached)
+  const liveJobs = [
+    { key: 'activeSessions', label: 'Active Sessions', path: `/resources/sessions/v1.0?filter[status][]=active&filter[status][]=pending`, max: 10 },
+    { key: 'chargePoints',   label: 'Charge Points',   path: `/resources/charge-points/v1.0`, max: 100 },
+  ];
+
+  // Incremental endpoints — use overlap window if we have a previous fetch time
+  // For full fetch, use the month range. For incremental, fetch only since last fetch (with overlap).
+  const sessionFrom  = isIncremental ? overlapFrom : from;
+  const txnFrom      = isIncremental ? overlapFrom : from;
+
+  const incrementalJobs = [
+    { key: 'sessions',     label: 'Sessions',     path: `/resources/sessions/v1.0?filter[startedAt][from]=${sessionFrom}&filter[startedAt][to]=${to}`, max: 50 },
+    { key: 'transactions', label: 'Transactions', path: `/resources/transactions/v1.0?filter[createdAt][from]=${txnFrom}&filter[createdAt][to]=${to}`, max: 50 },
+  ];
+
+  // These change rarely — only re-fetch if cache is older than 24h or no cache
+  const cacheAgeHours = cached ? (Date.now() - new Date(cached.cachedAt)) / 3600000 : 999;
+  const staticJobs = cacheAgeHours > 24 || !isIncremental ? [
+    { key: 'locations', label: 'Locations', path: `/resources/locations/v1.0`,   max: 100 },
+    { key: 'evses',     label: 'EVSEs',     path: `/resources/evses/v1.0`,        max: 100 },
+    { key: 'users',     label: 'Users',     path: `/resources/users/v1.0`,        max: 100 },
+  ] : [];
+
+  if (staticJobs.length === 0 && isIncremental) {
+    log(`⏭️ Locations/EVSEs/Users unchanged (cache < 24h) — skipping`, 'log-ok');
+  }
+
+  const allJobs = [...liveJobs, ...incrementalJobs, ...staticJobs];
+
+  for (const job of allJobs) {
+    try {
+      document.getElementById('loadingMsg').textContent = `Fetching ${job.label}...`;
+      const fresh = await fetchPages(job.path, job.max);
+
+      if (isIncremental && ['sessions','transactions'].includes(job.key)) {
+        const before = (data[job.key]||[]).length;
+        data[job.key] = mergeRecords(data[job.key] || [], fresh);
+        const added = data[job.key].length - before;
+        log(`✅ ${job.label}: +${added} new (${data[job.key].length} total)`, 'log-ok');
+      } else {
+        data[job.key] = fresh;
+        log(`✅ ${job.label}: ${fresh.length} records`, 'log-ok');
+      }
+    } catch(e) {
+      log(`❌ ${job.label}: ${e.message}`, 'log-err');
+    }
+  }
+
+  // Save to cache (all months including current — so incremental works tomorrow)
+  const toCache = { locations: data.locations, chargePoints: data.chargePoints, evses: data.evses, sessions: data.sessions, transactions: data.transactions, users: data.users };
+  saveToCache(ym, toCache, now);
+
+  allData = { ...data, _month: ym, _fromCache: isIncremental };
+  finishLoad();
 }
 
-function setLoading(msg) { document.getElementById('loadingMsg').textContent = msg; }
+function finishLoad() {
+  const total = Object.values(allData).reduce((a,b) => Array.isArray(b) ? a+b.length : a, 0);
+  const cached = loadFromCache(allData._month);
+  const ageMin = cached ? Math.round((Date.now() - new Date(cached.cachedAt)) / 60000) : 0;
+  const ageStr = ageMin < 60 ? `${ageMin}m ago` : `${Math.round(ageMin/60)}h ago`;
+  document.getElementById('recordCount').textContent = `${total.toLocaleString()} · synced ${ageStr}`;
+  document.getElementById('statusBadge').style.display = '';
+  document.getElementById('loadingEl').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('loadBtn').textContent = '🔄 Refresh';
+  document.getElementById('loadBtn').disabled = false;
+  updateMonthLabels();
+  buildTabs();
+  renderTab();
+}
+
+// ── UI helpers ──────────────────────────────────────────────────
+const n = v => { if (!v) return '–'; if (typeof v === 'string') return v; return v.en ?? v[Object.keys(v)[0]] ?? '–'; };
+const fmt = d => d ? new Date(d).toLocaleString() : '–';
+const fmtDate = d => d ? new Date(d).toLocaleDateString() : '–';
+const money = v => v != null ? `$${parseFloat(v).toFixed(2)}` : '–';
+
+const SC = { available:'#00c2a8', charging:'#3b82f6', faulted:'#ef4444', unavailable:'#f59e0b', preparing:'#a78bfa', finishing:'#06b6d4', reserved:'#f97316', online:'#00c2a8', offline:'#8892a4', active:'#3b82f6', pending:'#f59e0b', finished:'#10b981', completed:'#10b981', unknown:'#8892a4' };
+const badgeHtml = s => { const k=(s||'unknown').toLowerCase(); const c=SC[k]||'#8892a4'; return `<span class="badge-status" style="background:${c}22;color:${c};border:1px solid ${c}44">${s||'unknown'}</span>`; };
 
 const TABS = [
-  { key:'overview',      label:'Overview' },
-  { key:'chargepoints',  label:'Charge Points',  dk:'chargePoints' },
-  { key:'evses',         label:'EVSEs',          dk:'evses' },
-  { key:'sessions',      label:'Sessions (30d)',  dk:'recentSessions' },
-  { key:'locations',     label:'Locations',      dk:'locations' },
-  { key:'users',         label:'Users',          dk:'users' },
-  { key:'transactions',  label:'Transactions',   dk:'transactions' },
+  { key:'overview',     label:'Overview' },
+  { key:'chargepoints', label:'Charge Points',  dk:'chargePoints' },
+  { key:'evses',        label:'EVSEs',          dk:'evses' },
+  { key:'sessions',     label:'Sessions',       dk:'sessions' },
+  { key:'locations',    label:'Locations',      dk:'locations' },
+  { key:'users',        label:'Users',          dk:'users' },
+  { key:'transactions', label:'Transactions',   dk:'transactions' },
 ];
 
 function buildTabs() {
@@ -256,42 +340,78 @@ function switchTab(key) {
   renderTab();
 }
 
-function getSearch() { return document.getElementById('searchBox').value.toLowerCase(); }
 function filterArr(arr, fields) {
-  const q = getSearch();
+  const q = document.getElementById('searchBox').value.toLowerCase();
   if (!q) return arr;
   return arr.filter(item => fields.some(f => String(item[f]||'').toLowerCase().includes(q)));
 }
 
+// ── Render ──────────────────────────────────────────────────────
 function renderTab() {
   const el = document.getElementById('tabContent');
-      const { chargePoints:cp=[], locations:locs=[], activeSessions:activeSess=[], recentSessions:sess=[], users:usrs=[], transactions:txns=[], evses=[] } = allData || {};
+  const { chargePoints:cp=[], locations:locs=[], activeSessions:active=[], sessions:sess=[], users:usrs=[], transactions:txns=[], evses=[] } = allData || {};
+  const ym = allData?._month || getSelectedMonth();
+  const monthLabel = new Date(ym + '-15').toLocaleString('default', { month: 'long', year: 'numeric' });
 
   if (currentTab === 'overview') {
     const cpOnline = cp.filter(c => ['online','available','charging'].includes((c.connectivity_status||c.status||'').toLowerCase())).length;
-    const activeSess = sess.filter(s => ['charging','active','pending'].includes((s.status||'').toLowerCase())).length;
-    const totalEnergy = sess.reduce((a,s) => a + parseFloat(s.energy||s.kwh||0), 0) / 1000; // energy is in Wh
-    const totalRev = sess.reduce((a,s) => a + parseFloat(s.amount||s.total_cost||s.cost||0), 0);
-
+    const totalEnergy = sess.reduce((a,s) => a + parseFloat(s.energy||0), 0) / 1000;
+    const totalRev = txns.reduce((a,t) => a + parseFloat(t.amount||t.totalAmount?.withTax||0), 0);
     const statusCounts = cp.reduce((a,c) => { const s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; }, {});
+
+    // Top locations by session count
+    const locSessions = sess.reduce((a,s) => { const id=s.locationId||s.location_id; if(id){a[id]=(a[id]||0)+1;} return a; }, {});
+    const topLocs = Object.entries(locSessions).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxSess = topLocs[0]?.[1] || 1;
 
     el.innerHTML = `
       <div class="cards">
         <div class="card"><div class="card-icon">🔌</div><div class="card-label">Charge Points</div><div class="card-value" style="color:#00c2a8">${cp.length.toLocaleString()}</div><div class="card-sub">${cpOnline} active</div></div>
         <div class="card"><div class="card-icon">📍</div><div class="card-label">Locations</div><div class="card-value" style="color:#3b82f6">${locs.length.toLocaleString()}</div></div>
-        <div class="card"><div class="card-icon">⚡</div><div class="card-label">Active Sessions</div><div class="card-value" style="color:#a78bfa">${activeSess.length}</div></div>
-        <div class="card"><div class="card-icon">🔋</div><div class="card-label">Energy This Month (kWh)</div><div class="card-value" style="color:#f59e0b">${totalEnergy.toFixed(1)}</div></div>
-        <div class="card"><div class="card-icon">💰</div><div class="card-label">Revenue This Month</div><div class="card-value" style="color:#10b981">${totalRev.toFixed(2)}</div></div>
-        <div class="card"><div class="card-icon">👤</div><div class="card-label">Users</div><div class="card-value" style="color:#f97316">${usrs.length.toLocaleString()}</div></div>
+        <div class="card"><div class="card-icon">⚡</div><div class="card-label">Active Now</div><div class="card-value" style="color:#a78bfa">${active.length}</div></div>
+        <div class="card"><div class="card-icon">📋</div><div class="card-label">Sessions in ${monthLabel}</div><div class="card-value" style="color:#06b6d4">${sess.length.toLocaleString()}</div></div>
+        <div class="card"><div class="card-icon">🔋</div><div class="card-label">Energy ${monthLabel} (kWh)</div><div class="card-value" style="color:#f59e0b">${totalEnergy.toFixed(1)}</div></div>
+        <div class="card"><div class="card-icon">💰</div><div class="card-label">Revenue ${monthLabel}</div><div class="card-value" style="color:#10b981">$${totalRev.toFixed(2)}</div></div>
+        <div class="card"><div class="card-icon">👤</div><div class="card-label">Total Users</div><div class="card-value" style="color:#f97316">${usrs.length.toLocaleString()}</div></div>
       </div>
+
+      ${active.length ? `
+      <div class="section">
+        <div class="section-title">⚡ Live Active Sessions (${active.length})</div>
+        <div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr>${['Session ID','Charge Point','User','Started','Energy (kWh)'].map(h=>`<th style="padding:8px 12px;text-align:left;background:#0d1117;color:#8892a4;font-size:12px">${h}</th>`).join('')}</tr></thead>
+          <tbody>${active.map((s,i)=>`<tr style="background:${i%2===0?'#1a1f2e':'#1e2535'}">
+            <td style="padding:7px 12px;font-family:monospace;font-size:11px;color:#8892a4">${s.id}</td>
+            <td style="padding:7px 12px;color:#8892a4">${s.chargePointId||'–'}</td>
+            <td style="padding:7px 12px;color:#8892a4">${s.userId||'–'}</td>
+            <td style="padding:7px 12px;color:#8892a4;font-size:12px">${fmt(s.startedAt)}</td>
+            <td style="padding:7px 12px;font-weight:600">${(parseFloat(s.energy||0)/1000).toFixed(2)}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+      </div>` : ''}
+
       ${cp.length ? `<div class="section"><div class="section-title">Charge Point Status</div><div class="status-grid">${Object.entries(statusCounts).map(([s,cnt]) => `<div class="status-box">${badgeHtml(s)}<div class="status-num">${cnt}</div></div>`).join('')}</div></div>` : ''}
-      ${locs.length ? `<div class="section"><div class="section-title">Locations (${locs.length.toLocaleString()})</div><div class="grid">${locs.slice(0,24).map(l => `<div class="loc-card"><div class="loc-name">📍 ${n(l.name)}</div><div class="loc-addr">${[n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–'}</div><div class="loc-id">ID: ${l.id}${l.external_id?` · ${l.external_id}`:''}</div>${l.public_charge_points!=null?`<div class="loc-cp">🔌 ${l.public_charge_points} public charge points</div>`:''}</div>`).join('')}</div></div>` : ''}
+
+      ${topLocs.length ? `
+      <div class="progress-bar">
+        <div class="progress-title">Top Locations by Sessions — ${monthLabel}</div>
+        ${topLocs.map(([id, cnt]) => {
+          const loc = locs.find(l => String(l.id) === String(id));
+          const label = loc ? n(loc.name) : `Location ${id}`;
+          return `<div class="progress-item">
+            <div class="progress-label"><span>${label}</span><span style="color:#8892a4">${cnt} sessions</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:${Math.round(cnt/maxSess*100)}%;background:#00c2a8"></div></div>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+
+      ${locs.length ? `<div class="section"><div class="section-title">All Locations (${locs.length.toLocaleString()})</div><div class="grid">${locs.slice(0,24).map(l => `<div class="loc-card"><div class="loc-name">📍 ${n(l.name)}</div><div class="loc-addr">${[n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–'}</div><div class="loc-id">${l.external_id||`ID: ${l.id}`}</div>${l.public_charge_points!=null?`<div class="loc-cp">🔌 ${l.public_charge_points} public CPs</div>`:''}</div>`).join('')}</div></div>` : ''}
     `;
     return;
   }
 
   if (currentTab === 'chargepoints') {
-    const rows = filterArr(cp, ['id','serial_number']).map((c,i) =>
+    const rows = filterArr(cp, ['id','serial_number','name']).map((c,i) =>
       `<tr><td class="mono">${c.id}</td><td class="bold">${n(c.name)}</td><td class="mono muted">${c.serial_number||'–'}</td><td>${badgeHtml(c.connectivity_status||c.status)}</td><td class="muted">${c.location_id||'–'}</td><td class="muted">${c.model||c.vendor||'–'}</td></tr>`
     ).join('');
     el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Serial</th><th>Status</th><th>Location ID</th><th>Model</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No results</td></tr>'}</tbody></table></div>`;
@@ -299,48 +419,53 @@ function renderTab() {
   }
 
   if (currentTab === 'evses') {
-    const rows = filterArr(evses, ['id','network_id','status','charge_point_id']).map(e =>
-      `<tr><td class="muted">${e.id}</td><td class="mono">${e.network_id||e.evse_id||'–'}</td><td>${badgeHtml(e.status)}</td><td class="muted">${e.charge_point_id||'–'}</td><td class="muted">${e.connector_type||e.connectors?.[0]?.type||'–'}</td><td class="muted">${e.max_power||'–'}</td></tr>`
+    const rows = filterArr(evses, ['id','network_id','status','charge_point_id']).map((e,i) =>
+      `<tr><td class="muted">${e.id}</td><td class="mono">${e.network_id||e.evse_id||'–'}</td><td>${badgeHtml(e.status)}</td><td class="muted">${e.charge_point_id||e.chargePointId||'–'}</td><td class="muted">${e.connector_type||e.connectors?.[0]?.type||'–'}</td><td class="muted">${e.max_power||'–'}</td></tr>`
     ).join('');
     el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Network ID</th><th>Status</th><th>Charge Point</th><th>Connector</th><th>Max kW</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No EVSEs</td></tr>'}</tbody></table></div>`;
     return;
   }
 
   if (currentTab === 'sessions') {
-    const allSess = [...(allData.activeSessions||[]), ...(allData.recentSessions||[])];
-    const seen = new Set(); 
-    const deduped = allSess.filter(s => seen.has(s.id) ? false : seen.add(s.id));
-    const rows = filterArr(deduped, ['id','status','chargePointId','userId']).slice(0,500).map(s =>
-      `<tr><td class="mono">${s.id}</td><td>${badgeHtml(s.status)}</td><td class="muted" style="font-size:12px">${fmt(s.startedAt)}</td><td class="bold">${(parseFloat(s.energy||0)/1000).toFixed(2)}</td><td class="muted">${s.stoppedAt&&s.startedAt?Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m':'–'}</td><td class="muted">${s.chargePointId||'–'}</td><td class="muted">${s.userId||'–'}</td><td class="green">${money(s.amount)}</td></tr>`
-    ).join('');
-    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Status</th><th>Started</th><th>kWh</th><th>Duration</th><th>Charge Point</th><th>User</th><th>Amount</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">No sessions</td></tr>'}</tbody></table></div>`;
+    const combined = [...active, ...sess];
+    const seen = new Set();
+    const deduped = combined.filter(s => seen.has(s.id) ? false : seen.add(s.id));
+    const rows = filterArr(deduped, ['id','status','chargePointId','userId']).slice(0,500).map((s,i) => {
+      const dur = s.stoppedAt && s.startedAt ? Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m' : '–';
+      return `<tr><td class="mono">${s.id}</td><td>${badgeHtml(s.status)}</td><td class="muted" style="font-size:12px">${fmt(s.startedAt)}</td><td class="bold">${(parseFloat(s.energy||0)/1000).toFixed(2)}</td><td class="muted">${dur}</td><td class="muted">${s.chargePointId||'–'}</td><td class="muted">${s.userId||'–'}</td><td class="green">${money(s.amount)}</td></tr>`;
+    }).join('');
+    el.innerHTML = `<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing ${monthLabel} + active sessions</div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Status</th><th>Started</th><th>kWh</th><th>Duration</th><th>Charge Point</th><th>User</th><th>Amount</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">No sessions</td></tr>'}</tbody></table></div>`;
     return;
   }
 
   if (currentTab === 'locations') {
     const rows = filterArr(locs, ['city','country','post_code','region']).map(l =>
-      `<div class="loc-card"><div class="loc-name">📍 ${n(l.name)}</div><div class="loc-addr">${[n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–'}</div><div class="loc-id">ID: ${l.id}${l.external_id?` · ${l.external_id}`:''} · ${l.timezone||''}</div>${l.public_charge_points!=null?`<div class="loc-cp">🔌 ${l.public_charge_points} public charge points</div>`:''}</div>`
+      `<div class="loc-card"><div class="loc-name">📍 ${n(l.name)}</div><div class="loc-addr">${[n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–'}</div><div class="loc-id">${l.external_id||''} · ID: ${l.id} · ${l.timezone||''}</div>${l.public_charge_points!=null?`<div class="loc-cp">🔌 ${l.public_charge_points} public CPs</div>`:''}</div>`
     ).join('');
     el.innerHTML = `<div class="grid">${rows||'<div class="empty">No locations</div>'}</div>`;
     return;
   }
 
   if (currentTab === 'users') {
-    const rows = filterArr(usrs, ['id','email','first_name','last_name','name']).slice(0,300).map(u =>
-      `<tr><td class="muted">${u.id}</td><td class="bold">${[u.first_name,u.last_name].filter(Boolean).join(' ')||n(u.name)}</td><td class="muted">${u.email||'–'}</td><td>${badgeHtml(u.status)}</td><td class="green">${money(u.balance)}</td><td class="muted">${fmtDate(u.created_at)}</td></tr>`
+    const rows = filterArr(usrs, ['id','email','first_name','last_name']).slice(0,500).map((u,i) =>
+      `<tr><td class="muted">${u.id}</td><td class="bold">${[u.first_name,u.last_name].filter(Boolean).join(' ')||n(u.name)||'–'}</td><td class="muted">${u.email||'–'}</td><td>${badgeHtml(u.status)}</td><td class="green">${money(u.balance)}</td><td class="muted">${fmtDate(u.created_at||u.createdAt)}</td></tr>`
     ).join('');
     el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Balance</th><th>Created</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No users</td></tr>'}</tbody></table></div>`;
     return;
   }
 
   if (currentTab === 'transactions') {
-    const rows = filterArr(txns, ['id','session_id','status']).slice(0,300).map(t =>
-      `<tr><td class="mono">${t.id}</td><td class="mono muted">${t.session_id||'–'}</td><td class="green">${money(t.amount||t.total)}</td><td class="muted">${t.currency||'USD'}</td><td>${badgeHtml(t.status)}</td><td class="muted" style="font-size:12px">${fmt(t.created_at)}</td></tr>`
+    const rows = filterArr(txns, ['id','session_id','status']).slice(0,500).map((t,i) =>
+      `<tr><td class="mono">${t.id}</td><td class="mono muted">${t.session_id||t.sessionId||'–'}</td><td class="green">${money(t.amount||t.totalAmount?.withTax)}</td><td class="muted">${t.currency||'USD'}</td><td>${badgeHtml(t.status||t.paymentStatus)}</td><td class="muted" style="font-size:12px">${fmt(t.created_at||t.createdAt)}</td></tr>`
     ).join('');
-    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Session</th><th>Amount</th><th>Currency</th><th>Status</th><th>Created</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No transactions</td></tr>'}</tbody></table></div>`;
+    el.innerHTML = `<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing ${monthLabel}</div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Session</th><th>Amount</th><th>Currency</th><th>Status</th><th>Created</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No transactions</td></tr>'}</tbody></table></div>`;
     return;
   }
 }
+
+// Init
+buildMonthOptions();
+updateMonthLabels();
 </script>
 </body>
 </html>
