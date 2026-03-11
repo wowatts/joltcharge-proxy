@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ampeco Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e2e8f0; font-family: system-ui, sans-serif; padding: 20px; min-height: 100vh; }
+  h1 { font-size: 20px; font-weight: 700; }
+  .subtitle { color: #4b5563; font-size: 12px; margin-top: 2px; }
+  .header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+  .logo { background: #00c2a8; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .btn { background: #00c2a8; color: #0d1117; border: none; border-radius: 9px; padding: 8px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .badge { background: #00c2a818; color: #00c2a8; border: 1px solid #00c2a840; border-radius: 8px; padding: 4px 12px; font-size: 12px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tab { background: transparent; color: #8892a4; border: none; border-radius: 8px; padding: 7px 14px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .tab.active { background: #00c2a8; color: #0d1117; }
+  .tab-count { background: #ffffff18; border-radius: 99px; padding: 1px 6px; font-size: 10px; }
+  .tab.active .tab-count { background: #0d111766; }
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .card { background: #1a1f2e; border-radius: 12px; padding: 18px 22px; flex: 1; min-width: 140px; }
+  .card-icon { font-size: 24px; margin-bottom: 4px; }
+  .card-label { color: #8892a4; font-size: 12px; margin-bottom: 4px; }
+  .card-value { font-size: 28px; font-weight: 700; }
+  .card-sub { color: #8892a4; font-size: 11px; margin-top: 4px; }
+  .search { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 8px; padding: 8px 14px; color: #e2e8f0; font-size: 13px; width: 100%; margin-bottom: 14px; }
+  .table-wrap { background: #1a1f2e; border-radius: 12px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { padding: 10px 13px; text-align: left; font-weight: 600; background: #0d1117; color: #8892a4; font-size: 12px; white-space: nowrap; }
+  tr:nth-child(even) td { background: #1e2535; }
+  tr:nth-child(odd) td { background: #1a1f2e; }
+  td { padding: 8px 13px; border-top: 1px solid #2d3748; }
+  .mono { font-family: monospace; font-size: 11px; color: #8892a4; }
+  .muted { color: #8892a4; }
+  .bold { font-weight: 600; }
+  .green { color: #10b981; font-weight: 600; }
+  .badge-status { border-radius: 6px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .loc-card { background: #1a1f2e; border-radius: 12px; padding: 16px; }
+  .loc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .loc-addr { color: #8892a4; font-size: 12px; margin-bottom: 4px; }
+  .loc-id { color: #4b5563; font-size: 11px; }
+  .loc-cp { color: #00c2a8; font-size: 12px; margin-top: 6px; }
+  .status-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+  .status-box { background: #0d1117; border-radius: 8px; padding: 10px 16px; text-align: center; }
+  .status-num { font-weight: 700; font-size: 22px; margin-top: 6px; }
+  .section { background: #1a1f2e; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+  .section-title { font-weight: 600; margin-bottom: 14px; }
+  .spinner { text-align: center; padding: 60px; color: #8892a4; }
+  .spinner-icon { font-size: 36px; display: inline-block; animation: spin 1.2s linear infinite; }
+  .spinner-msg { font-size: 14px; margin-top: 10px; }
+  .spinner-sub { font-size: 12px; color: #4b5563; margin-top: 6px; }
+  .error { background: #ef444418; border: 1px solid #ef444440; border-radius: 10px; padding: 14px; color: #ef4444; margin-bottom: 16px; font-size: 13px; }
+  .empty { padding: 40px; text-align: center; color: #8892a4; }
+  .welcome { background: #1a1f2e; border-radius: 12px; padding: 50px; text-align: center; }
+  .welcome-icon { font-size: 48px; margin-bottom: 14px; }
+  .welcome-title { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+  .welcome-sub { color: #8892a4; font-size: 14px; margin-bottom: 22px; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">⚡</div>
+  <div>
+    <h1>Ampeco Live Dashboard</h1>
+    <div class="subtitle">joltcharge-us.us.charge.ampeco.tech</div>
+  </div>
+  <div class="header-right">
+    <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Live Data</button>
+    <span class="badge" id="statusBadge" style="display:none">🟢 <span id="recordCount">0</span> records</span>
+  </div>
+</div>
+
+<div id="loadingEl" style="display:none" class="spinner">
+  <div class="spinner-icon">⚡</div>
+  <div class="spinner-msg" id="loadingMsg">Loading...</div>
+  <div class="spinner-sub">Fetching from Ampeco via proxy</div>
+</div>
+
+<div id="errorEl" style="display:none" class="error"></div>
+
+<div id="mainContent" style="display:none">
+  <div class="tabs" id="tabs"></div>
+  <input type="text" class="search" id="searchBox" placeholder="Search..." oninput="renderTab()" style="display:none" />
+  <div id="tabContent"></div>
+</div>
+
+<div id="welcomeEl" class="welcome">
+  <div class="welcome-icon">⚡</div>
+  <div class="welcome-title">Ampeco Dashboard</div>
+  <div class="welcome-sub">Click "Load Live Data" to connect to your Ampeco instance and pull live data.</div>
+  <button class="btn" onclick="loadAll()">🔌 Load Live Data</button>
+</div>
+
+<script>
+const PROXY = '/api/ampeco';
+const ENDPOINTS = {
+  locations:    '/resources/locations/v1.0',
+  chargePoints: '/resources/charge-points/v1.0',
+  sessions:     '/resources/sessions/v1.0',
+  users:        '/resources/users/v1.0',
+  transactions: '/resources/transactions/v1.0',
+  evses:        '/resources/evses/v1.0',
+};
+
+let allData = null;
+let currentTab = 'overview';
+
+const n = v => { if (!v) return '–'; if (typeof v === 'string') return v; return v.en ?? v[Object.keys(v)[0]] ?? '–'; };
+const fmt = d => d ? new Date(d).toLocaleString() : '–';
+const fmtDate = d => d ? new Date(d).toLocaleDateString() : '–';
+const money = v => v != null ? `$${parseFloat(v).toFixed(2)}` : '–';
+const kwh = v => parseFloat(v || 0).toFixed(2);
+
+const STATUS_COLORS = { available:'#00c2a8', charging:'#3b82f6', faulted:'#ef4444', unavailable:'#f59e0b', preparing:'#a78bfa', finishing:'#06b6d4', reserved:'#f97316', online:'#00c2a8', offline:'#8892a4', active:'#3b82f6', completed:'#10b981', unknown:'#8892a4' };
+const badgeHtml = s => {
+  const k = (s||'unknown').toLowerCase();
+  const c = STATUS_COLORS[k] || '#8892a4';
+  return `<span class="badge-status" style="background:${c}22;color:${c};border:1px solid ${c}44">${s||'unknown'}</span>`;
+};
+
+async function proxyGet(path, page=1) {
+  const url = `${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=${page}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+  return res.json();
+}
+
+async function fetchEndpoint(key, path) {
+  setLoading(`Fetching ${key}...`);
+  const first = await proxyGet(path, 1);
+  const items = first.data ?? first.items ?? (Array.isArray(first) ? first : []);
+  const lastPage = first.meta?.last_page ?? 1;
+  let all = [...items];
+  for (let p = 2; p <= Math.min(lastPage, 25); p++) {
+    setLoading(`Fetching ${key} page ${p}/${Math.min(lastPage,25)}...`);
+    const next = await proxyGet(path, p);
+    all = [...all, ...(next.data ?? next.items ?? [])];
+  }
+  return all;
+}
+
+async function loadAll() {
+  document.getElementById('welcomeEl').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('errorEl').style.display = 'none';
+  document.getElementById('loadingEl').style.display = 'block';
+  document.getElementById('loadBtn').disabled = true;
+
+  try {
+    const data = {};
+    for (const [key, path] of Object.entries(ENDPOINTS)) {
+      data[key] = await fetchEndpoint(key, path);
+    }
+    allData = data;
+    const total = Object.values(data).reduce((a,b) => a+b.length, 0);
+    document.getElementById('recordCount').textContent = total.toLocaleString();
+    document.getElementById('statusBadge').style.display = '';
+    document.getElementById('loadingEl').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('loadBtn').textContent = '🔄 Refresh';
+    document.getElementById('loadBtn').disabled = false;
+    buildTabs();
+    renderTab();
+  } catch(e) {
+    document.getElementById('loadingEl').style.display = 'none';
+    document.getElementById('welcomeEl').style.display = 'block';
+    document.getElementById('errorEl').style.display = 'block';
+    document.getElementById('errorEl').textContent = '⚠️ ' + e.message;
+    document.getElementById('loadBtn').disabled = false;
+  }
+}
+
+function setLoading(msg) { document.getElementById('loadingMsg').textContent = msg; }
+
+const TABS = [
+  { key:'overview', label:'Overview' },
+  { key:'chargepoints', label:'Charge Points', dk:'chargePoints' },
+  { key:'evses', label:'EVSEs', dk:'evses' },
+  { key:'sessions', label:'Sessions', dk:'sessions' },
+  { key:'locations', label:'Locations', dk:'locations' },
+  { key:'users', label:'Users', dk:'users' },
+  { key:'transactions', label:'Transactions', dk:'transactions' },
+];
+
+function buildTabs() {
+  document.getElementById('tabs').innerHTML = TABS.map(t => {
+    const count = t.dk ? (allData[t.dk]||[]).length : '';
+    return `<button class="tab ${t.key===currentTab?'active':''}" onclick="switchTab('${t.key}')">
+      ${t.label}${count ? `<span class="tab-count">${count.toLocaleString()}</span>` : ''}
+    </button>`;
+  }).join('');
+}
+
+function switchTab(key) {
+  currentTab = key;
+  document.getElementById('searchBox').value = '';
+  document.getElementById('searchBox').style.display = key === 'overview' ? 'none' : 'block';
+  document.getElementById('searchBox').placeholder = `Search ${key}...`;
+  buildTabs();
+  renderTab();
+}
+
+function getSearch() { return document.getElementById('searchBox').value.toLowerCase(); }
+function filterArr(arr, fields) {
+  const q = getSearch();
+  if (!q) return arr;
+  return arr.filter(item => fields.some(f => String(item[f]||'').toLowerCase().includes(q)));
+}
+
+function renderTab() {
+  const el = document.getElementById('tabContent');
+  const { chargePoints:cp=[], locations:locs=[], sessions:sess=[], users:usrs=[], transactions:txns=[], evses=[] } = allData || {};
+
+  if (currentTab === 'overview') {
+    const cpOnline = cp.filter(c => ['online','available','charging'].includes((c.connectivity_status||c.status||'').toLowerCase())).length;
+    const activeSess = sess.filter(s => ['charging','active'].includes((s.status||'').toLowerCase())).length;
+    const totalEnergy = sess.reduce((a,s) => a+parseFloat(s.kwh||s.energy||0), 0);
+    const totalRev = txns.reduce((a,t) => a+parseFloat(t.amount||t.total||0), 0);
+
+    const statusCounts = cp.reduce((a,c) => { const s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; }, {});
+
+    el.innerHTML = `
+      <div class="cards">
+        <div class="card"><div class="card-icon">🔌</div><div class="card-label">Charge Points</div><div class="card-value" style="color:#00c2a8">${cp.length.toLocaleString()}</div><div class="card-sub">${cpOnline} active</div></div>
+        <div class="card"><div class="card-icon">📍</div><div class="card-label">Locations</div><div class="card-value" style="color:#3b82f6">${locs.length.toLocaleString()}</div></div>
+        <div class="card"><div class="card-icon">⚡</div><div class="card-label">Active Sessions</div><div class="card-value" style="color:#a78bfa">${activeSess}</div></div>
+        <div class="card"><div class="card-icon">🔋</div><div class="card-label">Energy (kWh)</div><div class="card-value" style="color:#f59e0b">${totalEnergy.toFixed(1)}</div></div>
+        <div class="card"><div class="card-icon">💰</div><div class="card-label">Revenue</div><div class="card-value" style="color:#10b981">$${totalRev.toFixed(2)}</div></div>
+        <div class="card"><div class="card-icon">👤</div><div class="card-label">Users</div><div class="card-value" style="color:#f97316">${usrs.length.toLocaleString()}</div></div>
+      </div>
+      ${cp.length ? `<div class="section"><div class="section-title">Charge Point Status</div><div class="status-grid">${Object.entries(statusCounts).map(([s,cnt]) => `<div class="status-box">${badgeHtml(s)}<div class="status-num">${cnt}</div></div>`).join('')}</div></div>` : ''}
+      ${locs.length ? `<div class="section"><div class="section-title">Locations (${locs.length.toLocaleString()})</div><div class="grid">${locs.slice(0,24).map(l => `<div class="loc-card"><div class="loc-name">📍 ${n(l.name)}</div><div class="loc-addr">${[n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–'}</div><div class="loc-id">ID: ${l.id}${l.external_id?` · ${l.external_id}`:''}</div>${l.public_charge_points!=null?`<div class="loc-cp">🔌 ${l.public_charge_points} public charge points</div>`:''}</div>`).join('')}</div></div>` : ''}
+    `;
+    return;
+  }
+
+  if (currentTab === 'chargepoints') {
+    const rows = filterArr(cp, ['id','serial_number']).map((c,i) =>
+      `<tr><td class="mono">${c.id}</td><td class="bold">${n(c.name)}</td><td class="mono muted">${c.serial_number||'–'}</td><td>${badgeHtml(c.connectivity_status||c.status)}</td><td class="muted">${c.location_id||'–'}</td><td class="muted">${c.model||c.vendor||'–'}</td></tr>`
+    ).join('');
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Serial</th><th>Status</th><th>Location ID</th><th>Model</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No results</td></tr>'}</tbody></table></div>`;
+    return;
+  }
+
+  if (currentTab === 'evses') {
+    const rows = filterArr(evses, ['id','network_id','status','charge_point_id']).map(e =>
+      `<tr><td class="muted">${e.id}</td><td class="mono">${e.network_id||e.evse_id||'–'}</td><td>${badgeHtml(e.status)}</td><td class="muted">${e.charge_point_id||'–'}</td><td class="muted">${e.connector_type||e.connectors?.[0]?.type||'–'}</td><td class="muted">${e.max_power||'–'}</td></tr>`
+    ).join('');
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Network ID</th><th>Status</th><th>Charge Point</th><th>Connector</th><th>Max kW</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No EVSEs</td></tr>'}</tbody></table></div>`;
+    return;
+  }
+
+  if (currentTab === 'sessions') {
+    const rows = filterArr(sess, ['id','status','charge_point_id','user_id']).slice(0,500).map(s =>
+      `<tr><td class="mono">${s.id}</td><td>${badgeHtml(s.status)}</td><td class="muted" style="font-size:12px">${fmt(s.started_at)}</td><td class="bold">${kwh(s.kwh||s.energy)}</td><td class="muted">${s.duration_seconds?Math.floor(s.duration_seconds/60)+'m':'–'}</td><td class="muted">${s.charge_point_id||'–'}</td><td class="muted">${s.user_id||'–'}</td></tr>`
+    ).join('');
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Status</th><th>Started</th><th>kWh</th><th>Duration</th><th>Charge Point</th><th>User</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="empty">No sessions</td></tr>'}</tbody></table></div>`;
+    return;
+  }
+
+  if (currentTab === 'locations') {
+    const rows = filterArr(locs, ['city','country','post_code','region']).map(l =>
+      `<div class="loc-card"><div class="loc-name">📍 ${n(l.name)}</div><div class="loc-addr">${[n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–'}</div><div class="loc-id">ID: ${l.id}${l.external_id?` · ${l.external_id}`:''} · ${l.timezone||''}</div>${l.public_charge_points!=null?`<div class="loc-cp">🔌 ${l.public_charge_points} public charge points</div>`:''}</div>`
+    ).join('');
+    el.innerHTML = `<div class="grid">${rows||'<div class="empty">No locations</div>'}</div>`;
+    return;
+  }
+
+  if (currentTab === 'users') {
+    const rows = filterArr(usrs, ['id','email','first_name','last_name','name']).slice(0,300).map(u =>
+      `<tr><td class="muted">${u.id}</td><td class="bold">${[u.first_name,u.last_name].filter(Boolean).join(' ')||n(u.name)}</td><td class="muted">${u.email||'–'}</td><td>${badgeHtml(u.status)}</td><td class="green">${money(u.balance)}</td><td class="muted">${fmtDate(u.created_at)}</td></tr>`
+    ).join('');
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Balance</th><th>Created</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No users</td></tr>'}</tbody></table></div>`;
+    return;
+  }
+
+  if (currentTab === 'transactions') {
+    const rows = filterArr(txns, ['id','session_id','status']).slice(0,300).map(t =>
+      `<tr><td class="mono">${t.id}</td><td class="mono muted">${t.session_id||'–'}</td><td class="green">${money(t.amount||t.total)}</td><td class="muted">${t.currency||'USD'}</td><td>${badgeHtml(t.status)}</td><td class="muted" style="font-size:12px">${fmt(t.created_at)}</td></tr>`
+    ).join('');
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Session</th><th>Amount</th><th>Currency</th><th>Status</th><th>Created</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No transactions</td></tr>'}</tbody></table></div>`;
+    return;
+  }
+}
+</script>
+</body>
+</html>
