@@ -80,6 +80,7 @@
   <div class="spinner-icon">⚡</div>
   <div class="spinner-msg" id="loadingMsg">Loading...</div>
   <div class="spinner-sub">Fetching from Ampeco via proxy</div>
+  <div id="debugLog" style="margin-top:16px;background:#0d1117;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;text-align:left;min-height:60px;"></div>
 </div>
 
 <div id="errorEl" style="display:none" class="error"></div>
@@ -145,20 +146,60 @@ async function fetchEndpoint(key, path) {
   return all;
 }
 
+function log(msg, color) {
+  const el = document.getElementById('debugLog');
+  const line = document.createElement('div');
+  line.style.color = color || '#8892a4';
+  line.style.fontSize = '12px';
+  line.style.fontFamily = 'monospace';
+  line.style.marginBottom = '2px';
+  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
 async function loadAll() {
   document.getElementById('welcomeEl').style.display = 'none';
   document.getElementById('mainContent').style.display = 'none';
   document.getElementById('errorEl').style.display = 'none';
   document.getElementById('loadingEl').style.display = 'block';
+  document.getElementById('debugLog').innerHTML = '';
   document.getElementById('loadBtn').disabled = true;
+
+  log('Starting load...', '#00c2a8');
+  log('Proxy URL: ' + window.location.origin + PROXY, '#4b5563');
 
   try {
     const data = {};
     for (const [key, path] of Object.entries(ENDPOINTS)) {
-      data[key] = await fetchEndpoint(key, path);
+      try {
+        log(`Fetching ${key}...`);
+        const url = `${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=1`;
+        log(`  GET ${url}`, '#4b5563');
+        const res = await fetch(url);
+        log(`  Response status: ${res.status}`, res.ok ? '#00c2a8' : '#ef4444');
+        const json = await res.json();
+        const items = json.data ?? json.items ?? (Array.isArray(json) ? json : []);
+        log(`  Got ${items.length} items, last_page=${json.meta?.last_page ?? 1}`, '#00c2a8');
+
+        const lastPage = json.meta?.last_page ?? 1;
+        let all = [...items];
+        for (let p = 2; p <= Math.min(lastPage, 25); p++) {
+          setLoading(`Fetching ${key} page ${p}/${Math.min(lastPage,25)}...`);
+          const r = await fetch(`${PROXY}?path=${encodeURIComponent(path)}&per_page=100&page=${p}`);
+          const j = await r.json();
+          all = [...all, ...(j.data ?? j.items ?? [])];
+        }
+        data[key] = all;
+        log(`  ✅ ${key}: ${all.length} total records`, '#00c2a8');
+      } catch(e) {
+        log(`  ❌ ${key} failed: ${e.message}`, '#ef4444');
+        data[key] = [];
+      }
     }
     allData = data;
     const total = Object.values(data).reduce((a,b) => a+b.length, 0);
+    log(`Done! Total: ${total} records`, '#00c2a8');
     document.getElementById('recordCount').textContent = total.toLocaleString();
     document.getElementById('statusBadge').style.display = '';
     document.getElementById('loadingEl').style.display = 'none';
@@ -168,6 +209,7 @@ async function loadAll() {
     buildTabs();
     renderTab();
   } catch(e) {
+    log('Fatal error: ' + e.message, '#ef4444');
     document.getElementById('loadingEl').style.display = 'none';
     document.getElementById('welcomeEl').style.display = 'block';
     document.getElementById('errorEl').style.display = 'block';
