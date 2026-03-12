@@ -298,6 +298,7 @@ function mergeById(existing, incoming) {
 
 // ── Main load ─────────────────────────────────────────────────────
 async function loadAll() {
+  try {
   const ym = getYM(), now = new Date().toISOString();
   const range = monthRange(ym);
   const cached = loadCache(ym);
@@ -364,10 +365,11 @@ async function loadAll() {
     log('✅ Active sessions: '+data.activeSessions.length, 'lok');
   } catch(e) { log('❌ Active sessions: '+e.message,'lerr'); data.activeSessions=[]; }
 
+  console.log('[loadAll] jobs done, calling saveCache');
   saveCache(ym, data, now);
-  console.log('[loadAll] saveCache called for', ym);
+  console.log('[loadAll] saveCache returned, setting allData');
   allData = Object.assign(data, {_month:ym});
-  console.log('[loadAll] allData set, calling showDashboard');
+  console.log('[loadAll] calling showDashboard');
   showDashboard();
 }
 
