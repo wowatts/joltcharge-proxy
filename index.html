@@ -9,25 +9,25 @@
 body{background:#0d1117;color:#e2e8f0;font-family:system-ui,sans-serif;padding:20px;min-height:100vh}
 .header{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
 .logo{background:#00c2a8;border-radius:10px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.header-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hr{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btn{background:#00c2a8;color:#0d1117;border:none;border-radius:9px;padding:8px 18px;font-weight:700;font-size:13px;cursor:pointer}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn-ghost{background:#1a1f2e;color:#8892a4;border:1px solid #2d3748;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer}
+.gbtn{background:#1a1f2e;color:#8892a4;border:1px solid #2d3748;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer}
 .sel{background:#1a1f2e;color:#e2e8f0;border:1px solid #2d3748;border-radius:9px;padding:8px 14px;font-size:13px}
-.badge{background:#00c2a818;color:#00c2a8;border:1px solid #00c2a840;border-radius:8px;padding:4px 12px;font-size:12px}
+.bdg{background:#00c2a818;color:#00c2a8;border:1px solid #00c2a840;border-radius:8px;padding:4px 12px;font-size:12px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
 .tab{background:transparent;color:#8892a4;border:none;border-radius:8px;padding:7px 14px;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
 .tab.active{background:#00c2a8;color:#0d1117}
-.tab-count{background:#ffffff18;border-radius:99px;padding:1px 6px;font-size:10px}
-.tab.active .tab-count{background:#0d111766}
+.tc{background:#ffffff18;border-radius:99px;padding:1px 6px;font-size:10px}
+.tab.active .tc{background:#0d111766}
 .cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
 .card{background:#1a1f2e;border-radius:12px;padding:18px 22px;flex:1;min-width:140px}
-.card-icon{font-size:24px;margin-bottom:4px}
-.card-label{color:#8892a4;font-size:12px;margin-bottom:4px}
-.card-value{font-size:28px;font-weight:700}
-.card-sub{color:#8892a4;font-size:11px;margin-top:4px}
+.ci{font-size:24px;margin-bottom:4px}
+.cl{color:#8892a4;font-size:12px;margin-bottom:4px}
+.cv{font-size:28px;font-weight:700}
+.cs{color:#8892a4;font-size:11px;margin-top:4px}
 .search{background:#1a1f2e;border:1px solid #2d3748;border-radius:8px;padding:8px 14px;color:#e2e8f0;font-size:13px;width:100%;margin-bottom:14px}
-.tbl-wrap{background:#1a1f2e;border-radius:12px;overflow:auto}
+.tw{background:#1a1f2e;border-radius:12px;overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{padding:10px 13px;text-align:left;font-weight:600;background:#0d1117;color:#8892a4;font-size:12px;white-space:nowrap}
 tr:nth-child(even) td{background:#1e2535}
@@ -38,26 +38,25 @@ td{padding:8px 13px;border-top:1px solid #2d3748}
 .green{color:#10b981;font-weight:600}
 .bs{border-radius:6px;padding:2px 9px;font-size:11px;font-weight:600}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.loc-card{background:#1a1f2e;border-radius:12px;padding:16px}
-.section{background:#1a1f2e;border-radius:12px;padding:18px;margin-bottom:16px}
-.section-title{font-weight:600;margin-bottom:14px}
-.status-grid{display:flex;gap:10px;flex-wrap:wrap}
-.status-box{background:#0d1117;border-radius:8px;padding:10px 16px;text-align:center}
-.status-num{font-weight:700;font-size:22px;margin-top:6px}
-.prog-wrap{background:#1a1f2e;border-radius:12px;padding:24px;margin-bottom:16px}
-.prog-item{margin-bottom:14px}
-.prog-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px}
-.prog-track{background:#0d1117;border-radius:99px;height:6px;overflow:hidden}
-.prog-fill{height:6px;border-radius:99px;background:#00c2a8}
-.spinner{text-align:center;padding:40px;color:#8892a4}
-.spin{font-size:36px;display:inline-block;animation:spin 1.2s linear infinite}
+.lcard{background:#1a1f2e;border-radius:12px;padding:16px}
+.sec{background:#1a1f2e;border-radius:12px;padding:18px;margin-bottom:16px}
+.stitle{font-weight:600;margin-bottom:14px}
+.sgrid{display:flex;gap:10px;flex-wrap:wrap}
+.sbox{background:#0d1117;border-radius:8px;padding:10px 16px;text-align:center}
+.snum{font-weight:700;font-size:22px;margin-top:6px}
+.pw{background:#1a1f2e;border-radius:12px;padding:24px;margin-bottom:16px}
+.pi{margin-bottom:14px}
+.pr{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px}
+.pt{background:#0d1117;border-radius:99px;height:6px;overflow:hidden}
+.pf{height:6px;border-radius:99px;background:#00c2a8}
+.spin-wrap{text-align:center;padding:40px;color:#8892a4}
+.spin{font-size:36px;display:inline-block;animation:sp 1.2s linear infinite}
 .plog{margin-top:12px;background:#0d1117;border-radius:8px;padding:10px 12px;max-height:160px;overflow-y:auto;text-align:left}
 .ll{font-family:monospace;font-size:11px;color:#8892a4;margin-bottom:2px}
 .lok{color:#00c2a8}.lerr{color:#ef4444}
 .err{background:#ef444418;border:1px solid #ef444440;border-radius:10px;padding:14px;color:#ef4444;margin-bottom:16px;font-size:13px;white-space:pre-wrap}
-.empty{padding:40px;text-align:center;color:#8892a4}
 .welcome{background:#1a1f2e;border-radius:12px;padding:50px;text-align:center}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -68,18 +67,18 @@ td{padding:8px 13px;border-top:1px solid #2d3748}
     <div style="font-weight:700;font-size:20px">Ampeco Dashboard</div>
     <div style="color:#4b5563;font-size:12px">joltcharge-us.us.charge.ampeco.tech</div>
   </div>
-  <div class="header-right">
+  <div class="hr">
     <select class="sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn-ghost" id="clearBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
+    <button class="gbtn" id="clearBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
     <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Data</button>
-    <span class="badge" id="badge" style="display:none">🟢 <span id="badgeTxt"></span></span>
+    <span class="bdg" id="badge" style="display:none">🟢 <span id="badgeTxt"></span></span>
     <span style="color:#4b5563;font-size:11px" id="cacheTxt"></span>
   </div>
 </div>
 
 <div class="err" id="errEl" style="display:none"></div>
 
-<div class="spinner" id="loadEl" style="display:none">
+<div class="spin-wrap" id="loadEl" style="display:none">
   <div class="spin">⚡</div>
   <div style="font-size:14px;margin-top:10px" id="loadMsg">Loading...</div>
   <div style="font-size:12px;color:#4b5563;margin-top:4px" id="loadSub"></div>
@@ -100,95 +99,92 @@ td{padding:8px 13px;border-top:1px solid #2d3748}
 </div>
 
 <script>
-const PROXY = '/api/ampeco';
-const SC = {available:'#00c2a8',charging:'#3b82f6',faulted:'#ef4444',unavailable:'#f59e0b',preparing:'#a78bfa',finishing:'#06b6d4',reserved:'#f97316',online:'#00c2a8',offline:'#8892a4',active:'#3b82f6',pending:'#f59e0b',finished:'#10b981',completed:'#10b981',unknown:'#8892a4'};
-const TABS = [
+var PROXY = '/api/ampeco';
+var SC = {available:'#00c2a8',charging:'#3b82f6',faulted:'#ef4444',unavailable:'#f59e0b',preparing:'#a78bfa',finishing:'#06b6d4',reserved:'#f97316',online:'#00c2a8',offline:'#8892a4',active:'#3b82f6',pending:'#f59e0b',finished:'#10b981',completed:'#10b981',unknown:'#8892a4'};
+var TABS = [
   {key:'overview',label:'Overview'},
   {key:'chargepoints',label:'Charge Points',dk:'chargePoints'},
   {key:'evses',label:'EVSEs',dk:'evses'},
   {key:'sessions',label:'Sessions',dk:'sessions'},
   {key:'locations',label:'Locations',dk:'locations'},
   {key:'users',label:'Users',dk:'users'},
-  {key:'transactions',label:'Transactions',dk:'transactions'},
+  {key:'transactions',label:'Transactions',dk:'transactions'}
 ];
+var allData = null;
+var currentTab = 'overview';
 
-let allData = null, currentTab = 'overview';
+function $(id) { return document.getElementById(id); }
+function n(v) { if (!v) return '–'; if (typeof v === 'string') return v; return v.en || v[Object.keys(v)[0]] || '–'; }
+function fmt(d) { return d ? new Date(d).toLocaleString() : '–'; }
+function fmtD(d) { return d ? new Date(d).toLocaleDateString() : '–'; }
+function money(v) { return (v != null && v !== '') ? '$' + parseFloat(v).toFixed(2) : '–'; }
 
-// ── Helpers ───────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-const n = v => !v ? '–' : typeof v === 'string' ? v : v.en || v[Object.keys(v)[0]] || '–';
-const fmt = d => d ? new Date(d).toLocaleString() : '–';
-const fmtD = d => d ? new Date(d).toLocaleDateString() : '–';
-const money = v => v != null && v !== '' ? '$' + parseFloat(v).toFixed(2) : '–';
-
-function badge(s) {
-  const k = (s||'unknown').toLowerCase();
-  const c = SC[k] || '#8892a4';
-  const el = document.createElement('span');
+function mkBadge(s) {
+  var k = (s||'unknown').toLowerCase(), c = SC[k]||'#8892a4';
+  var el = document.createElement('span');
   el.className = 'bs';
-  el.style.cssText = `background:${c}22;color:${c};border:1px solid ${c}44`;
-  el.textContent = s || 'unknown';
+  el.style.cssText = 'background:'+c+'22;color:'+c+';border:1px solid '+c+'44';
+  el.textContent = s||'unknown';
   return el;
 }
 
-function log(msg, cls) {
-  const el = $('plog'), d = document.createElement('div');
-  d.className = 'll' + (cls ? ' ' + cls : '');
-  d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+function addLog(msg, cls) {
+  var el = $('plog'), d = document.createElement('div');
+  d.className = 'll'+(cls?' '+cls:'');
+  d.textContent = '['+new Date().toLocaleTimeString()+'] '+msg;
   el.appendChild(d); el.scrollTop = el.scrollHeight;
 }
 
 // ── Cache ─────────────────────────────────────────────────────────
-const cKey = ym => 'ampeco_v2_' + ym;
+function cKey(ym) { return 'ampeco_v2_'+ym; }
 
 function saveCache(ym, data, lastFetch) {
-  console.log('[saveCache] START ym='+ym);
   try {
-    // Only store what's needed — summary stats + small sample
-    const payload = {
-      v: 2, savedAt: new Date().toISOString(), lastFetch,
+    var payload = {
+      v:2, savedAt:new Date().toISOString(), lastFetch:lastFetch,
       locations:    data.locations    || [],
       chargePoints: data.chargePoints || [],
       evses:        data.evses        || [],
       users:        data.users        || [],
       sessCount:    (data.sessions||[]).length,
       txnCount:     (data.transactions||[]).length,
-      totalEnergy:  (data.sessions||[]).reduce((a,s) => a + parseFloat(s.energy||0), 0),
-      totalRevenue: (data.transactions||[]).reduce((a,t) => a + parseFloat(t.totalAmount||t.amount||0), 0),
-      sessSample:   (data.sessions||[]).slice(0, 200),
-      txnSample:    (data.transactions||[]).slice(0, 200),
+      totalEnergy:  (data.sessions||[]).reduce(function(a,s){return a+parseFloat(s.energy||0);},0),
+      totalRevenue: (data.transactions||[]).reduce(function(a,t){return a+parseFloat(t.totalAmount||t.amount||0);},0),
+      sessSample:   (data.sessions||[]).slice(0,200),
+      txnSample:    (data.transactions||[]).slice(0,200)
     };
-    const str = JSON.stringify(payload);
+    var str = JSON.stringify(payload);
     localStorage.setItem(cKey(ym), str);
-    log('💾 Cached ' + ym + ' (' + Math.round(str.length/1024) + 'KB)', 'lok');
-    $('cacheTxt').textContent = '💾 ' + Math.round(str.length/1024) + 'KB cached';
+    var verify = localStorage.getItem(cKey(ym));
+    if (verify) {
+      var kb = Math.round(str.length/1024);
+      addLog('💾 Saved '+ym+' ('+kb+'KB)', 'lok');
+      $('cacheTxt').textContent = '💾 '+kb+'KB cached';
+    } else {
+      addLog('❌ Cache write failed (readback null)', 'lerr');
+    }
     updateMonthLabels();
   } catch(e) {
-    log('⚠️ Cache failed: ' + e.message, 'lerr');
+    addLog('❌ Cache error: '+e.name+' '+e.message, 'lerr');
+    $('cacheTxt').textContent = '❌ '+e.name;
   }
 }
 
 function loadCache(ym) {
   try {
-    const key = cKey(ym);
-    const raw = localStorage.getItem(key);
-    console.log('[Cache] loadCache('+ym+') key='+key+' found='+(raw?'yes ('+Math.round(raw.length/1024)+'KB)':'NO'));
+    var raw = localStorage.getItem(cKey(ym));
     return raw ? JSON.parse(raw) : null;
-  } catch(e) {
-    console.error('[Cache] loadCache error:', e);
-    return null;
-  }
+  } catch(e) { return null; }
 }
 
 function clearCache(ym) {
   localStorage.removeItem(cKey(ym));
-  log('🗑️ Cleared ' + ym);
   updateMonthLabels();
 }
 
-function cacheToAllData(c, ym) {
+function cacheToData(c, ym) {
   return {
-    _month: ym,
+    _month:ym,
     locations:    c.locations    || [],
     chargePoints: c.chargePoints || [],
     evses:        c.evses        || [],
@@ -196,91 +192,93 @@ function cacheToAllData(c, ym) {
     sessions:     c.sessSample   || [],
     transactions: c.txnSample    || [],
     activeSessions: [],
-    _sessCount:   c.sessCount   || 0,
-    _txnCount:    c.txnCount    || 0,
-    _totalEnergy: c.totalEnergy || 0,
-    _totalRevenue:c.totalRevenue|| 0,
+    _sessCount:   c.sessCount    || 0,
+    _txnCount:    c.txnCount     || 0,
+    _totalEnergy: c.totalEnergy  || 0,
+    _totalRevenue:c.totalRevenue || 0
   };
+}
+
+function mergeById(a, b) {
+  var map = {};
+  (a||[]).forEach(function(r){map[String(r.id)]=r;});
+  (b||[]).forEach(function(r){map[String(r.id)]=r;});
+  return Object.values(map);
 }
 
 // ── Month helpers ─────────────────────────────────────────────────
 function curYM() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  var d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 }
 function getYM() { return $('monthSel').value; }
 function isPast(ym) { return ym < curYM(); }
-
 function monthRange(ym) {
-  const [y,m] = ym.split('-').map(Number);
-  return { from: ym+'-01', to: ym+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0') };
+  var parts = ym.split('-'), y=parseInt(parts[0]), m=parseInt(parts[1]);
+  return {from:ym+'-01', to:ym+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0')};
 }
 
 function buildMonthOptions() {
-  const sel = $('monthSel');
+  var sel = $('monthSel');
   sel.innerHTML = '';
-  const now = new Date();
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    const ym = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    const opt = document.createElement('option');
+  var now = new Date();
+  for (var i=0; i<12; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var ym = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var opt = document.createElement('option');
     opt.value = ym;
     opt.textContent = d.toLocaleString('default',{month:'long',year:'numeric'});
     if (i===0) opt.selected = true;
     sel.appendChild(opt);
   }
-  // Check localStorage availability
   try {
     localStorage.setItem('ampeco_test','1');
     localStorage.removeItem('ampeco_test');
-    const keys = [];
-    for (let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ampeco_v2_'))keys.push(k.replace('ampeco_v2_',''));}
+    var keys=[];
+    for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith('ampeco_v2_'))keys.push(k.replace('ampeco_v2_',''));}
     $('cacheTxt').textContent = keys.length ? '💾 Cached: '+keys.join(', ') : '💾 Cache empty';
   } catch(e) { $('cacheTxt').textContent = '⚠️ No localStorage'; }
   updateMonthLabels();
 }
 
 function updateMonthLabels() {
-  const sel = $('monthSel');
-  for (let i=0;i<sel.options.length;i++) {
-    const opt = sel.options[i], ym = opt.value;
+  var sel = $('monthSel');
+  for (var i=0;i<sel.options.length;i++) {
+    var opt=sel.options[i], ym=opt.value;
     opt.textContent = opt.textContent.replace(/ [✓○]$/,'');
     if (isPast(ym)) opt.textContent += loadCache(ym) ? ' ✓' : ' ○';
   }
-  const ym = getYM();
-  const clearBtn = $('clearBtn');
-  if (clearBtn) clearBtn.style.display = (isPast(ym) && loadCache(ym)) ? '' : 'none';
+  var cb = $('clearBtn');
+  if (cb) cb.style.display = (isPast(getYM()) && loadCache(getYM())) ? '' : 'none';
 }
 
 function clearCurrentCache() { clearCache(getYM()); loadAll(); }
 
 function onMonthChange() {
   updateMonthLabels();
-  const ym = getYM();
-  console.log('[onMonthChange] ym='+ym);
-  const c = loadCache(ym);
-  console.log('[onMonthChange] cache=', c ? 'HIT (savedAt='+c.savedAt+')' : 'MISS');
+  var ym = getYM();
+  var c = loadCache(ym);
   if (c) {
-    log('📦 Loaded '+ym+' from cache instantly', 'lok');
-    allData = cacheToAllData(c, ym);
+    addLog('📦 Cache hit for '+ym, 'lok');
+    allData = cacheToData(c, ym);
     showDashboard();
-    backgroundRefresh(ym, c);
+    doBackgroundRefresh(ym, c);
   } else {
     loadAll();
   }
 }
 
 // ── Fetch ─────────────────────────────────────────────────────────
-async function fetchPages(path, max) {
+async function getPages(path, max) {
   max = max || 50;
-  let all = [], page = 1, last = 1;
+  var all = [], page = 1, last = 1;
   do {
-    const sep = path.includes('?') ? '&' : '?';
-    const url = PROXY + '?path=' + encodeURIComponent(path + sep + 'per_page=100&page='+page);
-    const res = await fetch(url);
+    var sep = path.indexOf('?') >= 0 ? '&' : '?';
+    var url = PROXY+'?path='+encodeURIComponent(path+sep+'per_page=100&page='+page);
+    var res = await fetch(url);
     if (!res.ok) throw new Error('HTTP '+res.status);
-    const j = await res.json();
-    const items = j.data || j.items || (Array.isArray(j)?j:[]);
+    var j = await res.json();
+    var items = j.data || j.items || (Array.isArray(j)?j:[]);
     all = all.concat(items);
     last = (j.meta&&j.meta.last_page) ? j.meta.last_page : 1;
     $('loadSub').textContent = 'Page '+page+' of '+Math.min(last,max);
@@ -289,21 +287,20 @@ async function fetchPages(path, max) {
   return all;
 }
 
-function mergeById(existing, incoming) {
-  const map = {};
-  (existing||[]).forEach(r => map[String(r.id)] = r);
-  (incoming||[]).forEach(r => map[String(r.id)] = r);
-  return Object.values(map);
-}
-
-// ── Main load ─────────────────────────────────────────────────────
+// ── Load all ──────────────────────────────────────────────────────
 async function loadAll() {
-  const ym = getYM(), now = new Date().toISOString();
-  const range = monthRange(ym);
-  const cached = loadCache(ym);
-  const isInc = !!cached;
-  const cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
-  const fromDt = cached&&cached.lastFetch ? (() => { const d=new Date(cached.lastFetch); d.setTime(d.getTime()-2*3600000); return d.toISOString().slice(0,10); })() : range.from;
+  var ym = getYM();
+  var now = new Date().toISOString();
+  var range = monthRange(ym);
+  var cached = loadCache(ym);
+  var isInc = !!cached;
+  var cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
+  var fromDt = range.from;
+  if (cached && cached.lastFetch) {
+    var d = new Date(cached.lastFetch);
+    d.setTime(d.getTime()-2*3600000);
+    fromDt = d.toISOString().slice(0,10);
+  }
 
   $('welcomeEl').style.display = 'none';
   $('main').style.display = 'none';
@@ -313,181 +310,107 @@ async function loadAll() {
   $('loadBtn').disabled = true;
   $('badge').style.display = 'none';
 
-  log((isInc ? '📦 Incremental update from '+fromDt : '🆕 Full fetch for '+ym), 'lok');
+  addLog(isInc ? '📦 Incremental from '+fromDt : '🆕 Full fetch '+ym, 'lok');
 
-  const data = isInc ? {
-    locations:    cached.locations    || [],
-    chargePoints: cached.chargePoints || [],
-    evses:        cached.evses        || [],
-    users:        cached.users        || [],
-    sessions:     cached.sessSample   || [],
-    transactions: cached.txnSample    || [],
-    activeSessions: [],
-  } : { locations:[],chargePoints:[],evses:[],sessions:[],transactions:[],activeSessions:[] };
+  var data = {
+    locations:    isInc ? (cached.locations    || []) : [],
+    chargePoints: isInc ? (cached.chargePoints || []) : [],
+    evses:        isInc ? (cached.evses        || []) : [],
+    users:        isInc ? (cached.users        || []) : [],
+    sessions:     isInc ? (cached.sessSample   || []) : [],
+    transactions: isInc ? (cached.txnSample    || []) : [],
+    activeSessions: []
+  };
 
-  const jobs = [
-    {key:'chargePoints', label:'Charge Points', path:'/resources/charge-points/v1.0', max:100},
-    {key:'sessions',     label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, max:100, merge:isInc},
-    {key:'transactions', label:'Transactions',  path:'/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, max:100, merge:isInc},
+  var jobs = [
+    {key:'chargePoints',label:'Charge Points',path:'/resources/charge-points/v1.0',max:100},
+    {key:'sessions',    label:'Sessions',     path:'/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, max:100, merge:isInc},
+    {key:'transactions',label:'Transactions', path:'/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, max:100, merge:isInc}
   ];
   if (!isInc || cacheAge>24) {
     jobs.push({key:'locations',label:'Locations',path:'/resources/locations/v1.0',max:100});
-    jobs.push({key:'evses',    label:'EVSEs',    path:'/resources/evses/v1.0',    max:100});
-    jobs.push({key:'users',    label:'Users',    path:'/resources/users/v1.0',    max:100});
+    jobs.push({key:'evses',label:'EVSEs',path:'/resources/evses/v1.0',max:100});
+    jobs.push({key:'users',label:'Users',path:'/resources/users/v1.0',max:100});
   } else {
-    log('⏭️ Locations/EVSEs/Users from cache (< 24h old)', 'lok');
+    addLog('⏭️ Locations/EVSEs/Users unchanged (<24h)', 'lok');
   }
 
-  for (const job of jobs) {
+  for (var i=0; i<jobs.length; i++) {
+    var job = jobs[i];
     try {
       $('loadMsg').textContent = 'Fetching '+job.label+'...';
-      const fresh = await fetchPages(job.path, job.max);
+      var fresh = await getPages(job.path, job.max);
       if (job.merge) {
-        const before = data[job.key].length;
+        var before = data[job.key].length;
         data[job.key] = mergeById(data[job.key], fresh);
-        log('✅ '+job.label+': +'+(data[job.key].length-before)+' new ('+data[job.key].length+' total)', 'lok');
+        addLog('✅ '+job.label+': +'+(data[job.key].length-before)+' ('+data[job.key].length+' total)', 'lok');
       } else {
         data[job.key] = fresh;
-        log('✅ '+job.label+': '+fresh.length, 'lok');
+        addLog('✅ '+job.label+': '+fresh.length, 'lok');
       }
     } catch(e) {
-      log('❌ '+job.label+': '+e.message, 'lerr');
+      addLog('❌ '+job.label+': '+e.message, 'lerr');
     }
   }
 
-  // Active sessions — last 24h, filter client-side
   try {
     $('loadMsg').textContent = 'Fetching active sessions...';
-    const last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
-    const recent = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
-    data.activeSessions = recent.filter(s => s.status==='active'||s.status==='pending');
-    log('✅ Active sessions: '+data.activeSessions.length, 'lok');
+    var last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
+    var recent = await getPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
+    data.activeSessions = recent.filter(function(s){return s.status==='active'||s.status==='pending';});
+    addLog('✅ Active: '+data.activeSessions.length, 'lok');
   } catch(e) {
-    log('❌ Active sessions: '+e.message,'lerr');
-    data.activeSessions=[];
+    addLog('❌ Active sessions: '+e.message, 'lerr');
+    data.activeSessions = [];
   }
 
   saveCache(ym, data, now);
-  allData = Object.assign(data, {_month:ym});
-  showDashboard();
-}
-  const ym = getYM(), now = new Date().toISOString();
-  const range = monthRange(ym);
-  const cached = loadCache(ym);
-  const isInc = !!cached;
-  const cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
-  const fromDt = cached&&cached.lastFetch ? (() => { const d=new Date(cached.lastFetch); d.setTime(d.getTime()-2*3600000); return d.toISOString().slice(0,10); })() : range.from;
-
-  $('welcomeEl').style.display = 'none';
-  $('main').style.display = 'none';
-  $('errEl').style.display = 'none';
-  $('loadEl').style.display = 'block';
-  $('plog').innerHTML = '';
-  $('loadBtn').disabled = true;
-  $('badge').style.display = 'none';
-
-  log((isInc ? '📦 Incremental update from '+fromDt : '🆕 Full fetch for '+ym), 'lok');
-
-  const data = isInc ? {
-    locations:    cached.locations    || [],
-    chargePoints: cached.chargePoints || [],
-    evses:        cached.evses        || [],
-    users:        cached.users        || [],
-    sessions:     cached.sessSample   || [],
-    transactions: cached.txnSample    || [],
-    activeSessions: [],
-  } : { locations:[],chargePoints:[],evses:[],sessions:[],transactions:[],activeSessions:[] };
-
-  const jobs = [
-    {key:'chargePoints', label:'Charge Points', path:'/resources/charge-points/v1.0', max:100},
-    {key:'sessions',     label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, max:100, merge:isInc},
-    {key:'transactions', label:'Transactions',  path:'/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, max:100, merge:isInc},
-  ];
-  if (!isInc || cacheAge>24) {
-    jobs.push({key:'locations',label:'Locations',path:'/resources/locations/v1.0',max:100});
-    jobs.push({key:'evses',    label:'EVSEs',    path:'/resources/evses/v1.0',    max:100});
-    jobs.push({key:'users',    label:'Users',    path:'/resources/users/v1.0',    max:100});
-  } else {
-    log('⏭️ Locations/EVSEs/Users from cache (< 24h old)', 'lok');
-  }
-
-  for (const job of jobs) {
-    try {
-      $('loadMsg').textContent = 'Fetching '+job.label+'...';
-      const fresh = await fetchPages(job.path, job.max);
-      if (job.merge) {
-        const before = data[job.key].length;
-        data[job.key] = mergeById(data[job.key], fresh);
-        log('✅ '+job.label+': +'+(data[job.key].length-before)+' new ('+data[job.key].length+' total)', 'lok');
-      } else {
-        data[job.key] = fresh;
-        log('✅ '+job.label+': '+fresh.length, 'lok');
-      }
-    } catch(e) {
-      log('❌ '+job.label+': '+e.message, 'lerr');
-    }
-  }
-
-  // Active sessions — last 24h, filter client-side
-  try {
-    $('loadMsg').textContent = 'Fetching active sessions...';
-    const last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
-    const recent = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
-    data.activeSessions = recent.filter(s => s.status==='active'||s.status==='pending');
-    log('✅ Active sessions: '+data.activeSessions.length, 'lok');
-  } catch(e) { log('❌ Active sessions: '+e.message,'lerr'); data.activeSessions=[]; }
-
-  console.log('[loadAll] jobs done, calling saveCache');
-  saveCache(ym, data, now);
-  console.log('[loadAll] saveCache returned, setting allData');
-  allData = Object.assign(data, {_month:ym});
-  console.log('[loadAll] calling showDashboard');
+  allData = data;
+  allData._month = ym;
   showDashboard();
 }
 
-async function backgroundRefresh(ym, cached) {
-  const now = new Date().toISOString();
-  const range = monthRange(ym);
-  const fromDt = cached&&cached.lastFetch ? (() => { const d=new Date(cached.lastFetch); d.setTime(d.getTime()-2*3600000); return d.toISOString().slice(0,10); })() : range.from;
-  const cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
-
+async function doBackgroundRefresh(ym, cached) {
+  var now = new Date().toISOString();
+  var range = monthRange(ym);
+  var fromDt = range.from;
+  if (cached && cached.lastFetch) {
+    var d = new Date(cached.lastFetch);
+    d.setTime(d.getTime()-2*3600000);
+    fromDt = d.toISOString().slice(0,10);
+  }
+  var cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
   try {
-    const [freshCP, freshSess, freshTxns] = await Promise.all([
-      fetchPages('/resources/charge-points/v1.0', 100),
-      fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, 100),
-      fetchPages('/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, 100),
-    ]);
+    var freshCP   = await getPages('/resources/charge-points/v1.0', 100);
+    var freshSess = await getPages('/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, 100);
+    var freshTxns = await getPages('/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, 100);
     allData.chargePoints  = freshCP;
     allData.sessions      = mergeById(allData.sessions, freshSess);
     allData.transactions  = mergeById(allData.transactions, freshTxns);
-
-    if (cacheAge > 24) {
-      const [locs, evses, users] = await Promise.all([
-        fetchPages('/resources/locations/v1.0', 100),
-        fetchPages('/resources/evses/v1.0', 100),
-        fetchPages('/resources/users/v1.0', 100),
-      ]);
-      allData.locations = locs; allData.evses = evses; allData.users = users;
+    if (cacheAge>24) {
+      allData.locations = await getPages('/resources/locations/v1.0', 100);
+      allData.evses     = await getPages('/resources/evses/v1.0', 100);
+      allData.users     = await getPages('/resources/users/v1.0', 100);
     }
-
-    const last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
-    const recent = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
-    allData.activeSessions = recent.filter(s => s.status==='active'||s.status==='pending');
-
+    var last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
+    var recent = await getPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
+    allData.activeSessions = recent.filter(function(s){return s.status==='active'||s.status==='pending';});
     delete allData._sessCount; delete allData._txnCount;
     delete allData._totalEnergy; delete allData._totalRevenue;
     saveCache(ym, allData, now);
     showDashboard();
-  } catch(e) { console.error('Background refresh error:', e); }
+  } catch(e) { console.error('Background refresh:', e); }
 }
 
 // ── Show dashboard ────────────────────────────────────────────────
 function showDashboard() {
   try {
-    const total = Object.values(allData).reduce((a,b)=>Array.isArray(b)?a+b.length:a, 0);
-    const c = loadCache(allData._month);
-    const ageMin = c ? Math.round((Date.now()-new Date(c.savedAt))/60000) : 0;
-    const ageStr = ageMin<60 ? ageMin+'m ago' : Math.round(ageMin/60)+'h ago';
+    var total = 0;
+    var keys = Object.keys(allData);
+    for (var i=0;i<keys.length;i++){if(Array.isArray(allData[keys[i]]))total+=allData[keys[i]].length;}
+    var c = loadCache(allData._month);
+    var ageMin = c ? Math.round((Date.now()-new Date(c.savedAt))/60000) : 0;
+    var ageStr = ageMin<60 ? ageMin+'m ago' : Math.round(ageMin/60)+'h ago';
     $('badgeTxt').textContent = total.toLocaleString()+' · synced '+ageStr;
     $('badge').style.display = '';
     $('loadEl').style.display = 'none';
@@ -509,15 +432,15 @@ function showDashboard() {
 
 // ── Tabs ──────────────────────────────────────────────────────────
 function buildTabs() {
-  const el = $('tabsEl'); el.innerHTML = '';
-  TABS.forEach(t => {
-    const btn = document.createElement('button');
+  var el = $('tabsEl'); el.innerHTML = '';
+  TABS.forEach(function(t) {
+    var btn = document.createElement('button');
     btn.className = 'tab'+(t.key===currentTab?' active':'');
-    btn.onclick = () => switchTab(t.key);
+    btn.onclick = function(){ switchTab(t.key); };
     btn.textContent = t.label;
     if (t.dk) {
-      const cnt = (allData[t.dk]||[]).length;
-      if (cnt) { const sp=document.createElement('span'); sp.className='tab-count'; sp.textContent=cnt.toLocaleString(); btn.appendChild(sp); }
+      var cnt = (allData[t.dk]||[]).length;
+      if (cnt) { var sp=document.createElement('span'); sp.className='tc'; sp.textContent=cnt.toLocaleString(); btn.appendChild(sp); }
     }
     el.appendChild(btn);
   });
@@ -525,207 +448,193 @@ function buildTabs() {
 
 function switchTab(key) {
   currentTab = key;
-  $('searchBox').style.display = key==='overview' ? 'none' : 'block';
+  $('searchBox').style.display = key==='overview'?'none':'block';
   $('searchBox').placeholder = 'Search '+key+'...';
   $('searchBox').value = '';
   buildTabs(); renderTab();
 }
 
-function getQ() { return $('searchBox').value.toLowerCase(); }
 function filterArr(arr, fields) {
-  const q = getQ(); if (!q) return arr;
-  return arr.filter(item => fields.some(f => String(item[f]||'').toLowerCase().includes(q)));
+  var q = $('searchBox').value.toLowerCase();
+  if (!q) return arr;
+  return arr.filter(function(item){return fields.some(function(f){return String(item[f]||'').toLowerCase().indexOf(q)>=0;});});
 }
 
-// ── Render helpers ────────────────────────────────────────────────
-function makeCard(icon, label, value, color, sub) {
-  const d = document.createElement('div'); d.className = 'card';
-  d.innerHTML = `<div class="card-icon">${icon}</div><div class="card-label">${label}</div><div class="card-value" style="color:${color}">${value}</div>${sub?`<div class="card-sub">${sub}</div>`:''}`;
+// ── DOM helpers ───────────────────────────────────────────────────
+function mkCard(icon,label,value,color,sub) {
+  var d=document.createElement('div'); d.className='card';
+  var i=document.createElement('div'); i.className='ci'; i.textContent=icon; d.appendChild(i);
+  var l=document.createElement('div'); l.className='cl'; l.textContent=label; d.appendChild(l);
+  var v=document.createElement('div'); v.className='cv'; v.style.color=color; v.textContent=value; d.appendChild(v);
+  if (sub){var s=document.createElement('div'); s.className='cs'; s.textContent=sub; d.appendChild(s);}
   return d;
 }
 
-function makeTable(headers, rows) {
-  const wrap = document.createElement('div'); wrap.className = 'tbl-wrap';
-  const tbl = document.createElement('table');
-  const thead = document.createElement('thead'), hr = document.createElement('tr');
-  headers.forEach(h => { const th=document.createElement('th'); th.textContent=h; hr.appendChild(th); });
+function mkTable(headers, rows) {
+  var wrap=document.createElement('div'); wrap.className='tw';
+  var tbl=document.createElement('table');
+  var thead=document.createElement('thead'), hr=document.createElement('tr');
+  headers.forEach(function(h){var th=document.createElement('th'); th.textContent=h; hr.appendChild(th);});
   thead.appendChild(hr); tbl.appendChild(thead);
-  const tbody = document.createElement('tbody');
-  if (!rows.length) {
-    const tr=document.createElement('tr'), td=document.createElement('td');
+  var tbody=document.createElement('tbody');
+  if (!rows||!rows.length) {
+    var tr=document.createElement('tr'), td=document.createElement('td');
     td.colSpan=headers.length; td.className='empty'; td.textContent='No data'; tr.appendChild(td); tbody.appendChild(tr);
-  } else { rows.forEach(r => tbody.appendChild(r)); }
+  } else { rows.forEach(function(r){tbody.appendChild(r);}); }
   tbl.appendChild(tbody); wrap.appendChild(tbl); return wrap;
 }
 
-function makeRow(cells) {
-  const tr = document.createElement('tr');
-  cells.forEach(c => { if (c instanceof HTMLElement) { tr.appendChild(c); } else { const td=document.createElement('td'); if (typeof c==='object'&&c.text!==undefined) { td.textContent=c.text; if(c.cls)td.className=c.cls; } else td.textContent=c||'–'; tr.appendChild(td); } });
+function mkRow(cells) {
+  var tr=document.createElement('tr');
+  cells.forEach(function(c){tr.appendChild(c);});
   return tr;
 }
-function cell(text, cls) { const td=document.createElement('td'); td.textContent=text||'–'; if(cls)td.className=cls; return td; }
-function badgeCell(s) { const td=document.createElement('td'); td.appendChild(badge(s)); return td; }
+
+function mkTd(text,cls) {
+  var td=document.createElement('td');
+  td.textContent=text||'–';
+  if(cls)td.className=cls;
+  return td;
+}
+
+function mkBdgTd(s) {
+  var td=document.createElement('td');
+  td.appendChild(mkBadge(s));
+  return td;
+}
 
 // ── Render ────────────────────────────────────────────────────────
 function renderTab() {
-  const el = $('tabContent'); el.innerHTML = '';
+  var el=$('tabContent'); el.innerHTML='';
   try {
-    const cp=allData.chargePoints||[], locs=allData.locations||[], active=allData.activeSessions||[];
-    const sess=allData.sessions||[], usrs=allData.users||[], txns=allData.transactions||[], evses=allData.evses||[];
-    const ym=allData._month||getYM();
-    const mLabel = new Date(ym+'-15').toLocaleString('default',{month:'long',year:'numeric'});
+    var cp=allData.chargePoints||[], locs=allData.locations||[];
+    var active=allData.activeSessions||[], sess=allData.sessions||[];
+    var usrs=allData.users||[], txns=allData.transactions||[], evses=allData.evses||[];
+    var ym=allData._month||getYM();
+    var mLabel=new Date(ym+'-15').toLocaleString('default',{month:'long',year:'numeric'});
 
     if (currentTab==='overview') {
-      const cpOnline = cp.filter(c=>['online','available','charging'].includes((c.connectivity_status||c.status||'').toLowerCase())).length;
-      const sessCount = allData._sessCount!=null ? allData._sessCount : sess.length;
-      const txnCount  = allData._txnCount !=null ? allData._txnCount  : txns.length;
-      const energy    = allData._totalEnergy!=null ? allData._totalEnergy/1000 : sess.reduce((a,s)=>a+parseFloat(s.energy||0),0)/1000;
-      const revenue   = allData._totalRevenue!=null ? allData._totalRevenue : txns.reduce((a,t)=>a+parseFloat(t.totalAmount||t.amount||0),0);
+      var cpOnline=cp.filter(function(c){return ['online','available','charging'].indexOf((c.connectivity_status||c.status||'').toLowerCase())>=0;}).length;
+      var sessCount=allData._sessCount!=null?allData._sessCount:sess.length;
+      var energy=allData._totalEnergy!=null?allData._totalEnergy/1000:sess.reduce(function(a,s){return a+parseFloat(s.energy||0);},0)/1000;
+      var revenue=allData._totalRevenue!=null?allData._totalRevenue:txns.reduce(function(a,t){return a+parseFloat(t.totalAmount||t.amount||0);},0);
 
-      const cards = document.createElement('div'); cards.className='cards';
-      [
-        makeCard('🔌','Charge Points',cp.length.toLocaleString(),'#00c2a8',cpOnline+' active'),
-        makeCard('📍','Locations',locs.length.toLocaleString(),'#3b82f6'),
-        makeCard('⚡','Active Now',active.length,'#a78bfa'),
-        makeCard('📋','Sessions '+mLabel,sessCount.toLocaleString(),'#06b6d4'),
-        makeCard('🔋','Energy '+mLabel+' kWh',energy.toFixed(1),'#f59e0b'),
-        makeCard('💰','Revenue '+mLabel,'$'+revenue.toFixed(2),'#10b981'),
-        makeCard('👤','Total Users',usrs.length.toLocaleString(),'#f97316'),
-      ].forEach(c=>cards.appendChild(c));
-      el.appendChild(cards);
+      var cards=document.createElement('div'); cards.className='cards';
+      [mkCard('🔌','Charge Points',cp.length.toLocaleString(),'#00c2a8',cpOnline+' active'),
+       mkCard('📍','Locations',locs.length.toLocaleString(),'#3b82f6'),
+       mkCard('⚡','Active Now',active.length,'#a78bfa'),
+       mkCard('📋','Sessions '+mLabel,sessCount.toLocaleString(),'#06b6d4'),
+       mkCard('🔋','Energy kWh',energy.toFixed(1),'#f59e0b',mLabel),
+       mkCard('💰','Revenue','$'+revenue.toFixed(2),'#10b981',mLabel),
+       mkCard('👤','Total Users',usrs.length.toLocaleString(),'#f97316')
+      ].forEach(function(c){cards.appendChild(c);}); el.appendChild(cards);
 
-      // Active sessions table
       if (active.length) {
-        const sec=document.createElement('div'); sec.className='section';
-        const title=document.createElement('div'); title.className='section-title'; title.textContent='⚡ Live Active Sessions ('+active.length+')'; sec.appendChild(title);
-        const rows=active.map(s=>makeRow([cell(s.id,'mono'),cell(s.chargePointId||'–','muted'),cell(s.userId||'–','muted'),cell(fmt(s.startedAt),'muted'),cell((parseFloat(s.energy||0)/1000).toFixed(2))]));
-        sec.appendChild(makeTable(['Session','Charge Point','User','Started','kWh'],rows)); el.appendChild(sec);
+        var sec=document.createElement('div'); sec.className='sec';
+        var t=document.createElement('div'); t.className='stitle'; t.textContent='⚡ Live Active Sessions ('+active.length+')'; sec.appendChild(t);
+        var rows=active.map(function(s){return mkRow([mkTd(s.id,'mono'),mkTd(s.chargePointId||'–','muted'),mkTd(s.userId||'–','muted'),mkTd(fmt(s.startedAt),'muted'),mkTd((parseFloat(s.energy||0)/1000).toFixed(2))]);});
+        sec.appendChild(mkTable(['Session','Charge Point','User','Started','kWh'],rows)); el.appendChild(sec);
       }
 
-      // Status breakdown
-      const statusCounts = cp.reduce((a,c)=>{ const s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; },{});
+      var statusCounts=cp.reduce(function(a,c){var s=c.connectivity_status||c.status||'unknown';a[s]=(a[s]||0)+1;return a;},{});
       if (Object.keys(statusCounts).length) {
-        const sec=document.createElement('div'); sec.className='section';
-        const title=document.createElement('div'); title.className='section-title'; title.textContent='Charge Point Status'; sec.appendChild(title);
-        const grid=document.createElement('div'); grid.className='status-grid';
-        Object.entries(statusCounts).forEach(([s,cnt])=>{ const box=document.createElement('div'); box.className='status-box'; box.appendChild(badge(s)); const num=document.createElement('div'); num.className='status-num'; num.textContent=cnt; box.appendChild(num); grid.appendChild(box); });
+        var sec=document.createElement('div'); sec.className='sec';
+        var t=document.createElement('div'); t.className='stitle'; t.textContent='Charge Point Status'; sec.appendChild(t);
+        var grid=document.createElement('div'); grid.className='sgrid';
+        Object.keys(statusCounts).forEach(function(s){var box=document.createElement('div'); box.className='sbox'; box.appendChild(mkBadge(s)); var num=document.createElement('div'); num.className='snum'; num.textContent=statusCounts[s]; box.appendChild(num); grid.appendChild(box);});
         sec.appendChild(grid); el.appendChild(sec);
       }
 
-      // Top locations chart
-      const locSess=sess.reduce((a,s)=>{ const id=s.locationId||s.location_id; if(id){a[id]=(a[id]||0)+1;} return a; },{});
-      const topLocs=Object.entries(locSess).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      var locSess=sess.reduce(function(a,s){var id=s.locationId||s.location_id;if(id){a[id]=(a[id]||0)+1;}return a;},{});
+      var topLocs=Object.keys(locSess).map(function(k){return [k,locSess[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
       if (topLocs.length) {
-        const max=topLocs[0][1];
-        const wrap=document.createElement('div'); wrap.className='prog-wrap';
-        const title=document.createElement('div'); title.className='section-title'; title.textContent='Top Locations — '+mLabel; wrap.appendChild(title);
-        topLocs.forEach(([id,cnt])=>{
-          const loc=locs.find(l=>String(l.id)===String(id));
-          const item=document.createElement('div'); item.className='prog-item';
-          const row=document.createElement('div'); row.className='prog-row';
-          const lbl=document.createElement('span'); lbl.textContent=loc?n(loc.name):'Location '+id;
-          const val=document.createElement('span'); val.style.color='#8892a4'; val.textContent=cnt+' sessions';
+        var max=topLocs[0][1];
+        var pw=document.createElement('div'); pw.className='pw';
+        var t=document.createElement('div'); t.className='stitle'; t.textContent='Top Locations — '+mLabel; pw.appendChild(t);
+        topLocs.forEach(function(entry){
+          var loc=locs.filter(function(l){return String(l.id)===String(entry[0]);})[0];
+          var item=document.createElement('div'); item.className='pi';
+          var row=document.createElement('div'); row.className='pr';
+          var lbl=document.createElement('span'); lbl.textContent=loc?n(loc.name):'Location '+entry[0];
+          var val=document.createElement('span'); val.style.color='#8892a4'; val.textContent=entry[1]+' sessions';
           row.appendChild(lbl); row.appendChild(val);
-          const track=document.createElement('div'); track.className='prog-track';
-          const fill=document.createElement('div'); fill.className='prog-fill'; fill.style.width=Math.round(cnt/max*100)+'%';
-          track.appendChild(fill); item.appendChild(row); item.appendChild(track); wrap.appendChild(item);
-        });
-        el.appendChild(wrap);
+          var track=document.createElement('div'); track.className='pt';
+          var fill=document.createElement('div'); fill.className='pf'; fill.style.width=Math.round(entry[1]/max*100)+'%';
+          track.appendChild(fill); item.appendChild(row); item.appendChild(track); pw.appendChild(item);
+        }); el.appendChild(pw);
       }
 
-      // Locations grid
       if (locs.length) {
-        const sec=document.createElement('div'); sec.className='section';
-        const title=document.createElement('div'); title.className='section-title'; title.textContent='Locations ('+locs.length.toLocaleString()+')'; sec.appendChild(title);
-        const grid=document.createElement('div'); grid.className='grid';
-        locs.slice(0,24).forEach(l=>{ const c=document.createElement('div'); c.className='loc-card'; c.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">📍 '+n(l.name)+'</div><div style="color:#8892a4;font-size:12px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div style="color:#4b5563;font-size:11px">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':''); grid.appendChild(c); });
-        sec.appendChild(grid); el.appendChild(sec);
+        var sec=document.createElement('div'); sec.className='sec';
+        var t=document.createElement('div'); t.className='stitle'; t.textContent='Locations ('+locs.length.toLocaleString()+')'; sec.appendChild(t);
+        var grid=document.createElement('div'); grid.className='grid';
+        locs.slice(0,24).forEach(function(l){
+          var c=document.createElement('div'); c.className='lcard';
+          c.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">📍 '+n(l.name)+'</div>'
+            +'<div style="color:#8892a4;font-size:12px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div>'
+            +'<div style="color:#4b5563;font-size:11px">'+(l.external_id||'ID: '+l.id)+'</div>'
+            +(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':'');
+          grid.appendChild(c);
+        }); sec.appendChild(grid); el.appendChild(sec);
       }
       return;
     }
 
     if (currentTab==='chargepoints') {
-      const rows=filterArr(cp,['id','serial_number']).map(c=>makeRow([cell(c.id,'mono'),cell(n(c.name)),cell(c.serial_number||'–','mono muted'),badgeCell(c.connectivity_status||c.status),cell(c.location_id||'–','muted'),cell(c.model||c.vendor||'–','muted')]));
-      el.appendChild(makeTable(['ID','Name','Serial','Status','Location','Model'],rows)); return;
+      var rows=filterArr(cp,['id','serial_number']).map(function(c){return mkRow([mkTd(c.id,'mono'),mkTd(n(c.name)),mkTd(c.serial_number||'–','mono muted'),mkBdgTd(c.connectivity_status||c.status),mkTd(c.location_id||'–','muted'),mkTd(c.model||c.vendor||'–','muted')]);});
+      el.appendChild(mkTable(['ID','Name','Serial','Status','Location','Model'],rows)); return;
     }
 
     if (currentTab==='evses') {
-      const rows=filterArr(evses,['id','network_id','charge_point_id']).map(e=>makeRow([cell(e.id,'muted'),cell(e.network_id||e.evse_id||'–','mono'),badgeCell(e.status),cell(e.charge_point_id||e.chargePointId||'–','muted'),cell(e.connector_type||(e.connectors&&e.connectors[0]&&e.connectors[0].type)||'–','muted'),cell(e.max_power||'–','muted')]));
-      el.appendChild(makeTable(['ID','Network ID','Status','Charge Point','Connector','Max kW'],rows)); return;
+      var rows=filterArr(evses,['id','network_id','charge_point_id']).map(function(e){return mkRow([mkTd(e.id,'muted'),mkTd(e.network_id||e.evse_id||'–','mono'),mkBdgTd(e.status),mkTd(e.charge_point_id||e.chargePointId||'–','muted'),mkTd(e.connector_type||(e.connectors&&e.connectors[0]&&e.connectors[0].type)||'–','muted'),mkTd(e.max_power||'–','muted')]);});
+      el.appendChild(mkTable(['ID','Network ID','Status','Charge Point','Connector','Max kW'],rows)); return;
     }
 
     if (currentTab==='sessions') {
-      const combined=[...active,...sess], seen=new Set();
-      const deduped=combined.filter(s=>seen.has(s.id)?false:seen.add(s.id));
-      const note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px'; note.textContent='Showing '+mLabel+' + active sessions'; el.appendChild(note);
-      const rows=filterArr(deduped,['id','status','chargePointId','userId']).slice(0,500).map(s=>{
-        const dur=s.stoppedAt&&s.startedAt?Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m':'–';
-        return makeRow([cell(s.id,'mono'),badgeCell(s.status),cell(fmt(s.startedAt),'muted'),cell((parseFloat(s.energy||0)/1000).toFixed(2)),cell(dur,'muted'),cell(s.chargePointId||'–','muted'),cell(s.userId||'–','muted'),cell(money(s.amount),'green')]);
+      var combined=active.concat(sess), seen={};
+      var deduped=combined.filter(function(s){if(seen[s.id])return false;seen[s.id]=true;return true;});
+      var note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px';
+      note.textContent='Showing '+mLabel+' + active sessions'; el.appendChild(note);
+      var rows=filterArr(deduped,['id','status','chargePointId','userId']).slice(0,500).map(function(s){
+        var dur=s.stoppedAt&&s.startedAt?Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m':'–';
+        return mkRow([mkTd(s.id,'mono'),mkBdgTd(s.status),mkTd(fmt(s.startedAt),'muted'),mkTd((parseFloat(s.energy||0)/1000).toFixed(2)),mkTd(dur,'muted'),mkTd(s.chargePointId||'–','muted'),mkTd(s.userId||'–','muted'),mkTd(money(s.amount),'green')]);
       });
-      el.appendChild(makeTable(['ID','Status','Started','kWh','Duration','Charge Point','User','Amount'],rows)); return;
+      el.appendChild(mkTable(['ID','Status','Started','kWh','Duration','Charge Point','User','Amount'],rows)); return;
     }
 
     if (currentTab==='locations') {
-      const grid=document.createElement('div'); grid.className='grid';
-      filterArr(locs,['city','country','post_code','region']).forEach(l=>{ const c=document.createElement('div'); c.className='loc-card'; c.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">📍 '+n(l.name)+'</div><div style="color:#8892a4;font-size:12px;margin-bottom:4px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div style="color:#4b5563;font-size:11px">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':''); grid.appendChild(c); });
-      el.appendChild(grid); return;
+      var grid=document.createElement('div'); grid.className='grid';
+      filterArr(locs,['city','country','post_code','region']).forEach(function(l){
+        var c=document.createElement('div'); c.className='lcard';
+        c.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">📍 '+n(l.name)+'</div>'
+          +'<div style="color:#8892a4;font-size:12px;margin-bottom:4px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div>'
+          +'<div style="color:#4b5563;font-size:11px">'+(l.external_id||'ID: '+l.id)+'</div>'
+          +(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':'');
+        grid.appendChild(c);
+      }); el.appendChild(grid); return;
     }
 
     if (currentTab==='users') {
-      const rows=filterArr(usrs,['id','email','first_name','last_name']).slice(0,500).map(u=>{
-        const nm=[u.first_name,u.last_name].filter(Boolean).join(' ')||n(u.name)||'–';
-        return makeRow([cell(u.id,'muted'),cell(nm),cell(u.email||'–','muted'),badgeCell(u.status),cell(money(u.balance),'green'),cell(fmtD(u.created_at||u.createdAt),'muted')]);
+      var rows=filterArr(usrs,['id','email','first_name','last_name']).slice(0,500).map(function(u){
+        var nm=[u.first_name,u.last_name].filter(Boolean).join(' ')||n(u.name)||'–';
+        return mkRow([mkTd(u.id,'muted'),mkTd(nm),mkTd(u.email||'–','muted'),mkBdgTd(u.status),mkTd(money(u.balance),'green'),mkTd(fmtD(u.created_at||u.createdAt),'muted')]);
       });
-      el.appendChild(makeTable(['ID','Name','Email','Status','Balance','Created'],rows)); return;
+      el.appendChild(mkTable(['ID','Name','Email','Status','Balance','Created'],rows)); return;
     }
 
     if (currentTab==='transactions') {
-      const note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px'; note.textContent='Showing '+mLabel; el.appendChild(note);
-      const rows=filterArr(txns,['id','sessionId','status']).slice(0,500).map(t=>makeRow([cell(t.id,'mono'),cell(t.sessionId||t.session_id||'–','mono muted'),cell(money(t.totalAmount||t.amount),'green'),cell(t.currency||'USD','muted'),badgeCell(t.status),cell(fmt(t.date||t.created_at),'muted')]));
-      el.appendChild(makeTable(['ID','Session','Amount','Currency','Status','Date'],rows));
+      var note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px';
+      note.textContent='Showing '+mLabel; el.appendChild(note);
+      var rows=filterArr(txns,['id','sessionId','status']).slice(0,500).map(function(t){
+        return mkRow([mkTd(t.id,'mono'),mkTd(t.sessionId||t.session_id||'–','mono muted'),mkTd(money(t.totalAmount||t.amount),'green'),mkTd(t.currency||'USD','muted'),mkBdgTd(t.status),mkTd(fmt(t.date||t.created_at),'muted')]);
+      });
+      el.appendChild(mkTable(['ID','Session','Amount','Currency','Status','Date'],rows));
     }
   } catch(e) {
-    const div=document.createElement('div'); div.className='err'; div.textContent='⚠️ Render error in "'+currentTab+'": '+e.message+'\n'+e.stack; el.appendChild(div);
-    console.error(e);
+    var div=document.createElement('div'); div.className='err';
+    div.textContent='⚠️ Render error in "'+currentTab+'": '+e.message+'\n'+e.stack;
+    el.appendChild(div); console.error(e);
   }
-}
-
-// ── Cache diagnostics ─────────────────────────────────────────────
-function diagCache() {
-  const out = [];
-  try {
-    // 1. Can we write?
-    localStorage.setItem('diag_test', 'hello');
-    const rb = localStorage.getItem('diag_test');
-    localStorage.removeItem('diag_test');
-    out.push('Write/read: ' + (rb === 'hello' ? '✅ OK' : '❌ FAILED'));
-
-    // 2. What keys exist?
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
-    out.push('All keys (' + keys.length + '): ' + (keys.length ? keys.join(', ') : '(none)'));
-
-    // 3. Try writing a real cache entry
-    const testKey = 'ampeco_v2_diag';
-    const testVal = JSON.stringify({ test: true, ts: Date.now() });
-    localStorage.setItem(testKey, testVal);
-    const rb2 = localStorage.getItem(testKey);
-    localStorage.removeItem(testKey);
-    out.push('Test cache entry: ' + (rb2 === testVal ? '✅ OK' : '❌ FAILED'));
-
-    // 4. Check current month key
-    const ym = getYM();
-    const existing = localStorage.getItem(cKey(ym));
-    out.push('Cache key "' + cKey(ym) + '": ' + (existing ? '✅ exists (' + Math.round(existing.length/1024) + 'KB)' : '❌ not found'));
-
-    // 5. List all ampeco keys
-    const aKeys = keys.filter(k => k.startsWith('ampeco'));
-    out.push('Ampeco keys: ' + (aKeys.length ? aKeys.join(', ') : '(none)'));
-
-  } catch(e) {
-    out.push('❌ Exception: ' + e.name + ': ' + e.message);
-  }
-  alert(out.join('\n'));
 }
 
 // ── Init ──────────────────────────────────────────────────────────
