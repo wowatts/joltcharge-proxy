@@ -70,7 +70,7 @@ td{padding:8px 13px;border-top:1px solid #2d3748}
   </div>
   <div class="header-right">
     <select class="sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn-ghost" onclick="diagCache()" style="font-size:12px">🔍 Cache Diag</button>
+    <button class="btn-ghost" id="clearBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
     <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Data</button>
     <span class="badge" id="badge" style="display:none">🟢 <span id="badgeTxt"></span></span>
     <span style="color:#4b5563;font-size:11px" id="cacheTxt"></span>
@@ -242,7 +242,8 @@ function updateMonthLabels() {
     if (isPast(ym)) opt.textContent += loadCache(ym) ? ' ✓' : ' ○';
   }
   const ym = getYM();
-  $('clearBtn').style.display = (isPast(ym) && loadCache(ym)) ? '' : 'none';
+  const clearBtn = $('clearBtn');
+  if (clearBtn) clearBtn.style.display = (isPast(ym) && loadCache(ym)) ? '' : 'none';
 }
 
 function clearCurrentCache() { clearCache(getYM()); loadAll(); }
