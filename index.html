@@ -298,7 +298,79 @@ function mergeById(existing, incoming) {
 
 // ── Main load ─────────────────────────────────────────────────────
 async function loadAll() {
+  const ym = getYM(), now = new Date().toISOString();
+  const range = monthRange(ym);
+  const cached = loadCache(ym);
+  const isInc = !!cached;
+  const cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
+  const fromDt = cached&&cached.lastFetch ? (() => { const d=new Date(cached.lastFetch); d.setTime(d.getTime()-2*3600000); return d.toISOString().slice(0,10); })() : range.from;
+
+  $('welcomeEl').style.display = 'none';
+  $('main').style.display = 'none';
+  $('errEl').style.display = 'none';
+  $('loadEl').style.display = 'block';
+  $('plog').innerHTML = '';
+  $('loadBtn').disabled = true;
+  $('badge').style.display = 'none';
+
+  log((isInc ? '📦 Incremental update from '+fromDt : '🆕 Full fetch for '+ym), 'lok');
+
+  const data = isInc ? {
+    locations:    cached.locations    || [],
+    chargePoints: cached.chargePoints || [],
+    evses:        cached.evses        || [],
+    users:        cached.users        || [],
+    sessions:     cached.sessSample   || [],
+    transactions: cached.txnSample    || [],
+    activeSessions: [],
+  } : { locations:[],chargePoints:[],evses:[],sessions:[],transactions:[],activeSessions:[] };
+
+  const jobs = [
+    {key:'chargePoints', label:'Charge Points', path:'/resources/charge-points/v1.0', max:100},
+    {key:'sessions',     label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, max:100, merge:isInc},
+    {key:'transactions', label:'Transactions',  path:'/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, max:100, merge:isInc},
+  ];
+  if (!isInc || cacheAge>24) {
+    jobs.push({key:'locations',label:'Locations',path:'/resources/locations/v1.0',max:100});
+    jobs.push({key:'evses',    label:'EVSEs',    path:'/resources/evses/v1.0',    max:100});
+    jobs.push({key:'users',    label:'Users',    path:'/resources/users/v1.0',    max:100});
+  } else {
+    log('⏭️ Locations/EVSEs/Users from cache (< 24h old)', 'lok');
+  }
+
+  for (const job of jobs) {
+    try {
+      $('loadMsg').textContent = 'Fetching '+job.label+'...';
+      const fresh = await fetchPages(job.path, job.max);
+      if (job.merge) {
+        const before = data[job.key].length;
+        data[job.key] = mergeById(data[job.key], fresh);
+        log('✅ '+job.label+': +'+(data[job.key].length-before)+' new ('+data[job.key].length+' total)', 'lok');
+      } else {
+        data[job.key] = fresh;
+        log('✅ '+job.label+': '+fresh.length, 'lok');
+      }
+    } catch(e) {
+      log('❌ '+job.label+': '+e.message, 'lerr');
+    }
+  }
+
+  // Active sessions — last 24h, filter client-side
   try {
+    $('loadMsg').textContent = 'Fetching active sessions...';
+    const last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
+    const recent = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
+    data.activeSessions = recent.filter(s => s.status==='active'||s.status==='pending');
+    log('✅ Active sessions: '+data.activeSessions.length, 'lok');
+  } catch(e) {
+    log('❌ Active sessions: '+e.message,'lerr');
+    data.activeSessions=[];
+  }
+
+  saveCache(ym, data, now);
+  allData = Object.assign(data, {_month:ym});
+  showDashboard();
+}
   const ym = getYM(), now = new Date().toISOString();
   const range = monthRange(ym);
   const cached = loadCache(ym);
