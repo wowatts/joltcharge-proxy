@@ -270,11 +270,9 @@ function onMonthChange() {
   var ym = getSelectedMonth();
   var cached = loadFromCache(ym);
   if (cached) {
-    // Instantly show cached data, then do a quick incremental update in background
-    log('📦 Showing cached data for ' + ym + ' instantly', 'log-ok');
-    allData = Object.assign({}, cached.data, { _month: ym, activeSessions: [] });
+    log('📦 Loading ' + ym + ' from cache instantly', 'log-ok');
+    allData = Object.assign(expandFromCache(cached), { _month: ym });
     showDashboard();
-    // Background incremental refresh
     backgroundRefresh(ym);
   } else {
     loadAll();
@@ -503,9 +501,119 @@ function renderTab() {
           card('🔌','Charge Points', cp.length.toLocaleString(), '#00c2a8', cpOnline+' active') +
           card('📍','Locations', locs.length.toLocaleString(), '#3b82f6') +
           card('⚡','Active Now', active.length, '#a78bfa') +
-          card('📋','Sessions '+monthLabel, sess.length.toLocaleString(), '#06b6d4') +
+          card('📋','Sessions '+monthLabel, sessCount.toLocaleString(), '#06b6d4') +
           card('🔋','Energy '+monthLabel+' (kWh)', totalEnergy.toFixed(1), '#f59e0b') +
-          card('💰','Revenue '+monthLabel, '$'+totalRev.toFixed(2), '#10b981') +
+          card('💰','Revenue '+monthLabel, '
+          card('👤','Total Users', usrs.length.toLocaleString(), '#f97316') +
+        '</div>' +
+        (active.length ? activeSessTable(active) : '') +
+        (Object.keys(statusCounts).length ? statusSection(statusCounts) : '') +
+        (topLocs.length ? topLocsChart(topLocs, locs, maxSess, monthLabel) : '') +
+        (locs.length ? locsGrid(locs.slice(0,24)) : '');
+      return;
+    }
+
+    if (currentTab === 'chargepoints') {
+      var rows = filterArr(cp, ['id','serial_number','name']).map(function(c,i) {
+        return tr(i, [td(c.id,'mono'), td(n(c.name),'bold'), td(c.serial_number||'–','mono muted'), '<td>'+badgeHtml(c.connectivity_status||c.status)+'</td>', td(c.location_id||'–','muted'), td(c.model||c.vendor||'–','muted')]);
+      }).join('');
+      el.innerHTML = tableWrap(['ID','Name','Serial','Status','Location ID','Model'], rows, 6);
+      return;
+    }
+
+    if (currentTab === 'evses') {
+      var rows = filterArr(evses, ['id','network_id','status','charge_point_id']).map(function(e,i) {
+        return tr(i, [td(e.id,'muted'), td(e.network_id||e.evse_id||'–','mono'), '<td>'+badgeHtml(e.status)+'</td>', td(e.charge_point_id||e.chargePointId||'–','muted'), td(e.connector_type||(e.connectors&&e.connectors[0]&&e.connectors[0].type)||'–','muted'), td(e.max_power||'–','muted')]);
+      }).join('');
+      el.innerHTML = tableWrap(['ID','Network ID','Status','Charge Point','Connector','Max kW'], rows, 6);
+      return;
+    }
+
+    if (currentTab === 'sessions') {
+      var combined = active.concat(sess);
+      var seen = {};
+      var deduped = combined.filter(function(s){ if(seen[s.id]) return false; seen[s.id]=true; return true; });
+      var rows = filterArr(deduped, ['id','status','chargePointId','userId']).slice(0,500).map(function(s,i) {
+        var dur = (s.stoppedAt && s.startedAt) ? Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m' : '–';
+        return tr(i, [td(s.id,'mono'), '<td>'+badgeHtml(s.status)+'</td>', td(fmt(s.startedAt),'muted'), td((parseFloat(s.energy||0)/1000).toFixed(2),'bold'), td(dur,'muted'), td(s.chargePointId||'–','muted'), td(s.userId||'–','muted'), td(money(s.amount),'green')]);
+      }).join('');
+      el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+' + active sessions</div>' + tableWrap(['ID','Status','Started','kWh','Duration','Charge Point','User','Amount'], rows, 8);
+      return;
+    }
+
+    if (currentTab === 'locations') {
+      el.innerHTML = '<div class="grid">' + filterArr(locs, ['city','country','post_code','region']).map(function(l) {
+        return '<div class="loc-card"><div class="loc-name">📍 '+n(l.name)+'</div><div class="loc-addr">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div class="loc-id">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div class="loc-cp">🔌 '+l.public_charge_points+' public CPs</div>':'')+'</div>';
+      }).join('') + '</div>';
+      return;
+    }
+
+    if (currentTab === 'users') {
+      var rows = filterArr(usrs, ['id','email','first_name','last_name']).slice(0,500).map(function(u,i) {
+        var name = [u.first_name,u.last_name].filter(Boolean).join(' ') || n(u.name) || '–';
+        return tr(i, [td(u.id,'muted'), td(name,'bold'), td(u.email||'–','muted'), '<td>'+badgeHtml(u.status)+'</td>', td(money(u.balance),'green'), td(fmtDate(u.created_at||u.createdAt),'muted')]);
+      }).join('');
+      el.innerHTML = tableWrap(['ID','Name','Email','Status','Balance','Created'], rows, 6);
+      return;
+    }
+
+    if (currentTab === 'transactions') {
+      var rows = filterArr(txns, ['id','session_id','status']).slice(0,500).map(function(t,i) {
+        var amt = t.totalAmount || t.amount || 0;
+        return tr(i, [td(t.id,'mono'), td(t.sessionId||t.session_id||'–','mono muted'), td(money(amt),'green'), td(t.currency||'USD','muted'), '<td>'+badgeHtml(t.status)+'</td>', td(fmt(t.date||t.created_at),'muted')]);
+      }).join('');
+      el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+'</div>' + tableWrap(['ID','Session','Amount','Currency','Status','Created'], rows, 6);
+      return;
+    }
+  } catch(e) {
+    el.innerHTML = '<div class="error">⚠️ Render error in "'+currentTab+'": '+e.message+'<br><pre style="font-size:11px;margin-top:8px">'+e.stack+'</pre></div>';
+    console.error(e);
+  }
+}
+
+// ── HTML helpers ──────────────────────────────────────────────────
+function card(icon, label, value, color, sub) {
+  return '<div class="card"><div class="card-icon">'+icon+'</div><div class="card-label">'+label+'</div><div class="card-value" style="color:'+color+'">'+value+'</div>'+(sub?'<div class="card-sub">'+sub+'</div>':'')+'</div>';
+}
+function td(val, cls) { return '<td'+(cls?' class="'+cls+'"':'')+'>'+val+'</td>'; }
+function tr(i, cells) { return '<tr>'+cells.join('')+'</tr>'; }
+function tableWrap(headers, rows, cols) {
+  var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
+  var empty = rows ? '' : '<tr><td colspan="'+cols+'" class="empty">No data</td></tr>';
+  return '<div class="table-wrap"><table><thead><tr>'+ths+'</tr></thead><tbody>'+(rows||empty)+'</tbody></table></div>';
+}
+function activeSessTable(active) {
+  var rows = active.map(function(s,i){
+    return tr(i, [td(s.id,'mono'), td(s.chargePointId||'–','muted'), td(s.userId||'–','muted'), td(fmt(s.startedAt),'muted'), td((parseFloat(s.energy||0)/1000).toFixed(2),'bold')]);
+  }).join('');
+  return '<div class="section"><div class="section-title">⚡ Live Active Sessions ('+active.length+')</div>'+tableWrap(['Session ID','Charge Point','User','Started','kWh'], rows, 5)+'</div>';
+}
+function statusSection(counts) {
+  var boxes = Object.entries(counts).map(function(e){ return '<div class="status-box">'+badgeHtml(e[0])+'<div class="status-num">'+e[1]+'</div></div>'; }).join('');
+  return '<div class="section"><div class="section-title">Charge Point Status</div><div class="status-grid">'+boxes+'</div></div>';
+}
+function topLocsChart(topLocs, locs, maxSess, monthLabel) {
+  var bars = topLocs.map(function(entry){
+    var loc = locs.filter(function(l){ return String(l.id)===String(entry[0]); })[0];
+    var label = loc ? n(loc.name) : 'Location '+entry[0];
+    var pct = Math.round(entry[1]/maxSess*100);
+    return '<div class="progress-item"><div class="progress-label"><span>'+label+'</span><span style="color:#8892a4">'+entry[1]+' sessions</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%;background:#00c2a8"></div></div></div>';
+  }).join('');
+  return '<div class="progress-bar"><div class="progress-title">Top Locations by Sessions — '+monthLabel+'</div>'+bars+'</div>';
+}
+function locsGrid(locs) {
+  var cards = locs.map(function(l){
+    return '<div class="loc-card"><div class="loc-name">📍 '+n(l.name)+'</div><div class="loc-addr">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div class="loc-id">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div class="loc-cp">🔌 '+l.public_charge_points+' public CPs</div>':'')+'</div>';
+  }).join('');
+  return '<div class="section"><div class="section-title">Locations ('+locs.length+')</div><div class="grid">'+cards+'</div></div>';
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+buildMonthOptions();
+</script>
+</body>
+</html>
++totalRev.toFixed(2), '#10b981') +
           card('👤','Total Users', usrs.length.toLocaleString(), '#f97316') +
         '</div>' +
         (active.length ? activeSessTable(active) : '') +
