@@ -142,6 +142,8 @@ function log(msg, cls) {
 const cKey = ym => 'ampeco_v2_' + ym;
 
 function saveCache(ym, data, lastFetch) {
+  console.log('[saveCache] START ym='+ym);
+  alert('[saveCache] called for '+ym+' — check console after clicking OK');
   try {
     // Only store what's needed — summary stats + small sample
     const payload = {
@@ -364,7 +366,9 @@ async function loadAll() {
   } catch(e) { log('❌ Active sessions: '+e.message,'lerr'); data.activeSessions=[]; }
 
   saveCache(ym, data, now);
+  console.log('[loadAll] saveCache called for', ym);
   allData = Object.assign(data, {_month:ym});
+  console.log('[loadAll] allData set, calling showDashboard');
   showDashboard();
 }
 
