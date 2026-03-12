@@ -143,7 +143,6 @@ const cKey = ym => 'ampeco_v2_' + ym;
 
 function saveCache(ym, data, lastFetch) {
   console.log('[saveCache] START ym='+ym);
-  alert('[saveCache] called for '+ym+' — check console after clicking OK');
   try {
     // Only store what's needed — summary stats + small sample
     const payload = {
