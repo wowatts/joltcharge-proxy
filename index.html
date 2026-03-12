@@ -237,7 +237,18 @@ function clearCurrentCache() {
 
 function onMonthChange() {
   updateMonthLabels();
-  if (allData) loadAll();
+  var ym = getSelectedMonth();
+  var cached = loadFromCache(ym);
+  if (cached) {
+    // Instantly show cached data, then do a quick incremental update in background
+    log('📦 Showing cached data for ' + ym + ' instantly', 'log-ok');
+    allData = Object.assign({}, cached.data, { _month: ym, activeSessions: [] });
+    showDashboard();
+    // Background incremental refresh
+    backgroundRefresh(ym);
+  } else {
+    loadAll();
+  }
 }
 
 // ── Fetch ─────────────────────────────────────────────────────────
@@ -246,9 +257,11 @@ async function fetchPages(path, maxPages) {
   maxPages = maxPages || 50;
   do {
     var sep = path.includes('?') ? '&' : '?';
-    var url = PROXY + '?path=' + encodeURIComponent(path + sep + 'per_page=100&page=' + page);
+    var fullPath = path + sep + 'per_page=100&page=' + page;
+    // Pass the entire path+query as the ?path= param — proxy will forward as-is
+    var url = PROXY + '?path=' + encodeURIComponent(fullPath);
     var res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + path);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     var json = await res.json();
     var items = json.data || json.items || (Array.isArray(json) ? json : []);
     all = all.concat(items);
@@ -259,7 +272,45 @@ async function fetchPages(path, maxPages) {
   return all;
 }
 
-// ── Load all data ─────────────────────────────────────────────────
+async function backgroundRefresh(ym) {
+  // Silently fetch only live + incremental data, merge into allData, re-render
+  var cached = loadFromCache(ym);
+  var now = new Date().toISOString();
+  var range = monthRange(ym);
+  var overlapFrom = (cached && cached.lastFetchedAt) ? withOverlap(cached.lastFetchedAt) : range.from;
+  var cacheAgeHours = cached ? (Date.now() - new Date(cached.savedAt)) / 3600000 : 9999;
+
+  // Show subtle "updating..." indicator
+  document.getElementById('recordCount').textContent += ' · updating...';
+
+  try {
+    // Always fetch live
+    var last24h = new Date(Date.now() - 24*3600*1000).toISOString().slice(0,10);
+    var recentSess = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]=' + last24h + '&sort=-startedAt', 5);
+    allData.activeSessions = recentSess.filter(function(s){ return s.status === 'active' || s.status === 'pending'; });
+    allData.chargePoints   = await fetchPages('/resources/charge-points/v1.0', 100);
+
+    // Incremental sessions + transactions
+    var freshSess = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+overlapFrom+'&filter[startedAt][to]='+range.to, 50);
+    var freshTxns = await fetchPages('/resources/transactions/v1.0?filter[date][from]='+overlapFrom+'&filter[date][to]='+range.to, 100);
+    allData.sessions      = mergeRecords(allData.sessions||[], freshSess);
+    allData.transactions  = mergeRecords(allData.transactions||[], freshTxns);
+
+    // Re-fetch static data if cache is old
+    if (cacheAgeHours > 24) {
+      allData.locations = await fetchPages('/resources/locations/v1.0', 100);
+      allData.evses     = await fetchPages('/resources/evses/v1.0', 100);
+      allData.users     = await fetchPages('/resources/users/v1.0', 100);
+    }
+
+    // Save updated cache
+    saveToCache(ym, { locations:allData.locations, chargePoints:allData.chargePoints, evses:allData.evses, sessions:allData.sessions, transactions:allData.transactions, users:allData.users }, now);
+    showDashboard();
+  } catch(e) {
+    console.error('Background refresh error:', e);
+    showDashboard(); // still show cached data even if refresh failed
+  }
+}
 async function loadAll() {
   var ym = getSelectedMonth();
   var range = monthRange(ym);
@@ -291,12 +342,15 @@ async function loadAll() {
   var jobs = [];
 
   // Always fetch live status
-  jobs.push({ key:'activeSessions', label:'Active Sessions', path:'/resources/sessions/v1.0?filter[status][]=active&filter[status][]=pending', max:10, merge:false });
+  // Active sessions — fetch last 24h and filter client-side (status filter not supported by API)
+  var last24h = new Date(Date.now() - 24*3600*1000).toISOString().slice(0,10);
+  var ACTIVE_PATH = '/resources/sessions/v1.0?filter[startedAt][from]=' + last24h + '&sort=-startedAt';
+  jobs.push({ key:'activeSessions', label:'Active Sessions', path: ACTIVE_PATH, max:5, merge:false, postFilter: function(items){ return items.filter(function(s){ return s.status === 'active' || s.status === 'pending'; }); } });
   jobs.push({ key:'chargePoints',   label:'Charge Points',   path:'/resources/charge-points/v1.0', max:100, merge:false });
 
   // Incremental sessions & transactions (from overlap point)
-  jobs.push({ key:'sessions',      label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+overlapFrom+'&filter[startedAt][to]='+range.to, max:50, merge:isIncremental });
-  jobs.push({ key:'transactions',  label:'Transactions',  path:'/resources/transactions/v1.0?filter[createdAt][from]='+overlapFrom+'&filter[createdAt][to]='+range.to, max:50, merge:isIncremental });
+  jobs.push({ key:'sessions',      label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+overlapFrom+'&filter[startedAt][to]='+range.to, max:100, merge:isIncremental });
+  jobs.push({ key:'transactions',  label:'Transactions',  path:'/resources/transactions/v1.0?filter[date][from]='+overlapFrom+'&filter[date][to]='+range.to, max:100, merge:isIncremental });
 
   // Static data — re-fetch if no cache or cache > 24h old
   if (!isIncremental || cacheAgeHours > 24) {
@@ -313,13 +367,14 @@ async function loadAll() {
     try {
       document.getElementById('loadingMsg').textContent = 'Fetching ' + job.label + '...';
       var fresh = await fetchPages(job.path, job.max);
+      var result = job.postFilter ? job.postFilter(fresh) : fresh;
       if (job.merge) {
         var before = (data[job.key] || []).length;
-        data[job.key] = mergeRecords(data[job.key] || [], fresh);
+        data[job.key] = mergeRecords(data[job.key] || [], result);
         log('✅ ' + job.label + ': +' + (data[job.key].length - before) + ' new (' + data[job.key].length + ' total)', 'log-ok');
       } else {
-        data[job.key] = fresh;
-        log('✅ ' + job.label + ': ' + fresh.length + ' records', 'log-ok');
+        data[job.key] = result;
+        log('✅ ' + job.label + ': ' + result.length + ' records', 'log-ok');
       }
     } catch(e) {
       log('❌ ' + job.label + ': ' + e.message, 'log-err');
@@ -405,7 +460,9 @@ function renderTab() {
     if (currentTab === 'overview') {
       var cpOnline = cp.filter(function(c){ return ['online','available','charging'].indexOf((c.connectivity_status||c.status||'').toLowerCase()) > -1; }).length;
       var totalEnergy = sess.reduce(function(a,s){ return a + parseFloat(s.energy||0); }, 0) / 1000;
-      var totalRev = txns.reduce(function(a,t){ return a + parseFloat(t.amount||(t.totalAmount&&t.totalAmount.withTax)||0); }, 0);
+      var totalRev = txns.reduce(function(a,t){
+        return a + parseFloat(t.totalAmount||t.amount||0);
+      }, 0);
       var statusCounts = cp.reduce(function(a,c){ var s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; }, {});
       var locSess = sess.reduce(function(a,s){ var id=s.locationId||s.location_id; if(id){a[id]=(a[id]||0)+1;} return a; }, {});
       var topLocs = Object.entries(locSess).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
@@ -474,8 +531,8 @@ function renderTab() {
 
     if (currentTab === 'transactions') {
       var rows = filterArr(txns, ['id','session_id','status']).slice(0,500).map(function(t,i) {
-        var amt = t.amount || (t.totalAmount && t.totalAmount.withTax) || 0;
-        return tr(i, [td(t.id,'mono'), td(t.session_id||t.sessionId||'–','mono muted'), td(money(amt),'green'), td(t.currency||'USD','muted'), '<td>'+badgeHtml(t.status||t.paymentStatus)+'</td>', td(fmt(t.created_at||t.createdAt),'muted')]);
+        var amt = t.totalAmount || t.amount || 0;
+        return tr(i, [td(t.id,'mono'), td(t.sessionId||t.session_id||'–','mono muted'), td(money(amt),'green'), td(t.currency||'USD','muted'), '<td>'+badgeHtml(t.status)+'</td>', td(fmt(t.date||t.created_at),'muted')]);
       }).join('');
       el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+'</div>' + tableWrap(['ID','Session','Amount','Currency','Status','Created'], rows, 6);
       return;
