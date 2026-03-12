@@ -1,69 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Ampeco Dashboard</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d1117; color: #e2e8f0; font-family: system-ui, sans-serif; padding: 20px; min-height: 100vh; }
-  .header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
-  .logo { background: #00c2a8; border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .btn { background: #00c2a8; color: #0d1117; border: none; border-radius: 9px; padding: 8px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-ghost { background: #1a1f2e; color: #8892a4; border: 1px solid #2d3748; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
-  .month-select { background: #1a1f2e; color: #e2e8f0; border: 1px solid #2d3748; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
-  .badge { background: #00c2a818; color: #00c2a8; border: 1px solid #00c2a840; border-radius: 8px; padding: 4px 12px; font-size: 12px; }
-  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
-  .tab { background: transparent; color: #8892a4; border: none; border-radius: 8px; padding: 7px 14px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-  .tab.active { background: #00c2a8; color: #0d1117; }
-  .tab-count { background: #ffffff18; border-radius: 99px; padding: 1px 6px; font-size: 10px; }
-  .tab.active .tab-count { background: #0d111766; }
-  .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-  .card { background: #1a1f2e; border-radius: 12px; padding: 18px 22px; flex: 1; min-width: 140px; }
-  .card-icon { font-size: 24px; margin-bottom: 4px; }
-  .card-label { color: #8892a4; font-size: 12px; margin-bottom: 4px; }
-  .card-value { font-size: 28px; font-weight: 700; }
-  .card-sub { color: #8892a4; font-size: 11px; margin-top: 4px; }
-  .search { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 8px; padding: 8px 14px; color: #e2e8f0; font-size: 13px; width: 100%; margin-bottom: 14px; }
-  .table-wrap { background: #1a1f2e; border-radius: 12px; overflow: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { padding: 10px 13px; text-align: left; font-weight: 600; background: #0d1117; color: #8892a4; font-size: 12px; white-space: nowrap; }
-  tr:nth-child(even) td { background: #1e2535; }
-  tr:nth-child(odd) td { background: #1a1f2e; }
-  td { padding: 8px 13px; border-top: 1px solid #2d3748; }
-  .mono { font-family: monospace; font-size: 11px; color: #8892a4; }
-  .muted { color: #8892a4; }
-  .bold { font-weight: 600; }
-  .green { color: #10b981; font-weight: 600; }
-  .badge-status { border-radius: 6px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
-  .loc-card { background: #1a1f2e; border-radius: 12px; padding: 16px; }
-  .loc-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
-  .loc-addr { color: #8892a4; font-size: 12px; margin-bottom: 4px; }
-  .loc-id { color: #4b5563; font-size: 11px; }
-  .loc-cp { color: #00c2a8; font-size: 12px; margin-top: 6px; }
-  .status-grid { display: flex; gap: 10px; flex-wrap: wrap; }
-  .status-box { background: #0d1117; border-radius: 8px; padding: 10px 16px; text-align: center; }
-  .status-num { font-weight: 700; font-size: 22px; margin-top: 6px; }
-  .section { background: #1a1f2e; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
-  .section-title { font-weight: 600; margin-bottom: 14px; }
-  .progress-bar { background: #1a1f2e; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
-  .progress-title { font-weight: 600; margin-bottom: 16px; }
-  .progress-item { margin-bottom: 14px; }
-  .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
-  .progress-track { background: #0d1117; border-radius: 99px; height: 6px; overflow: hidden; }
-  .progress-fill { height: 6px; border-radius: 99px; }
-  .spinner { text-align: center; padding: 40px; color: #8892a4; }
-  .spinner-icon { font-size: 36px; display: inline-block; animation: spin 1.2s linear infinite; }
-  .progress-log { margin-top: 12px; background: #0d1117; border-radius: 8px; padding: 10px 12px; max-height: 160px; overflow-y: auto; text-align: left; }
-  .log-line { font-family: monospace; font-size: 11px; color: #8892a4; margin-bottom: 2px; }
-  .log-ok { color: #00c2a8; }
-  .log-err { color: #ef4444; }
-  .error { background: #ef444418; border: 1px solid #ef444440; border-radius: 10px; padding: 14px; color: #ef4444; margin-bottom: 16px; font-size: 13px; white-space: pre-wrap; }
-  .empty { padding: 40px; text-align: center; color: #8892a4; }
-  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e2e8f0;font-family:system-ui,sans-serif;padding:20px;min-height:100vh}
+.header{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.logo{background:#00c2a8;border-radius:10px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.header-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{background:#00c2a8;color:#0d1117;border:none;border-radius:9px;padding:8px 18px;font-weight:700;font-size:13px;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:#1a1f2e;color:#8892a4;border:1px solid #2d3748;border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer}
+.sel{background:#1a1f2e;color:#e2e8f0;border:1px solid #2d3748;border-radius:9px;padding:8px 14px;font-size:13px}
+.badge{background:#00c2a818;color:#00c2a8;border:1px solid #00c2a840;border-radius:8px;padding:4px 12px;font-size:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.tab{background:transparent;color:#8892a4;border:none;border-radius:8px;padding:7px 14px;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.tab.active{background:#00c2a8;color:#0d1117}
+.tab-count{background:#ffffff18;border-radius:99px;padding:1px 6px;font-size:10px}
+.tab.active .tab-count{background:#0d111766}
+.cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.card{background:#1a1f2e;border-radius:12px;padding:18px 22px;flex:1;min-width:140px}
+.card-icon{font-size:24px;margin-bottom:4px}
+.card-label{color:#8892a4;font-size:12px;margin-bottom:4px}
+.card-value{font-size:28px;font-weight:700}
+.card-sub{color:#8892a4;font-size:11px;margin-top:4px}
+.search{background:#1a1f2e;border:1px solid #2d3748;border-radius:8px;padding:8px 14px;color:#e2e8f0;font-size:13px;width:100%;margin-bottom:14px}
+.tbl-wrap{background:#1a1f2e;border-radius:12px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 13px;text-align:left;font-weight:600;background:#0d1117;color:#8892a4;font-size:12px;white-space:nowrap}
+tr:nth-child(even) td{background:#1e2535}
+tr:nth-child(odd) td{background:#1a1f2e}
+td{padding:8px 13px;border-top:1px solid #2d3748}
+.mono{font-family:monospace;font-size:11px;color:#8892a4}
+.muted{color:#8892a4}
+.green{color:#10b981;font-weight:600}
+.bs{border-radius:6px;padding:2px 9px;font-size:11px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.loc-card{background:#1a1f2e;border-radius:12px;padding:16px}
+.section{background:#1a1f2e;border-radius:12px;padding:18px;margin-bottom:16px}
+.section-title{font-weight:600;margin-bottom:14px}
+.status-grid{display:flex;gap:10px;flex-wrap:wrap}
+.status-box{background:#0d1117;border-radius:8px;padding:10px 16px;text-align:center}
+.status-num{font-weight:700;font-size:22px;margin-top:6px}
+.prog-wrap{background:#1a1f2e;border-radius:12px;padding:24px;margin-bottom:16px}
+.prog-item{margin-bottom:14px}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px}
+.prog-track{background:#0d1117;border-radius:99px;height:6px;overflow:hidden}
+.prog-fill{height:6px;border-radius:99px;background:#00c2a8}
+.spinner{text-align:center;padding:40px;color:#8892a4}
+.spin{font-size:36px;display:inline-block;animation:spin 1.2s linear infinite}
+.plog{margin-top:12px;background:#0d1117;border-radius:8px;padding:10px 12px;max-height:160px;overflow-y:auto;text-align:left}
+.ll{font-family:monospace;font-size:11px;color:#8892a4;margin-bottom:2px}
+.lok{color:#00c2a8}.lerr{color:#ef4444}
+.err{background:#ef444418;border:1px solid #ef444440;border-radius:10px;padding:14px;color:#ef4444;margin-bottom:16px;font-size:13px;white-space:pre-wrap}
+.empty{padding:40px;text-align:center;color:#8892a4}
+.welcome{background:#1a1f2e;border-radius:12px;padding:50px;text-align:center}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -75,647 +69,540 @@
     <div style="color:#4b5563;font-size:12px">joltcharge-us.us.charge.ampeco.tech</div>
   </div>
   <div class="header-right">
-    <select class="month-select" id="monthSelect" onchange="onMonthChange()"></select>
-    <button class="btn-ghost" id="clearCacheBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
+    <select class="sel" id="monthSel" onchange="onMonthChange()"></select>
+    <button class="btn-ghost" id="clearBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
     <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Data</button>
-    <span class="badge" id="statusBadge" style="display:none">🟢 <span id="recordCount"></span></span>
-    <span style="color:#4b5563;font-size:11px;margin-left:4px" id="cacheStatus"></span>
+    <span class="badge" id="badge" style="display:none">🟢 <span id="badgeTxt"></span></span>
+    <span style="color:#4b5563;font-size:11px" id="cacheTxt"></span>
   </div>
 </div>
 
-<div id="errorEl" class="error" style="display:none"></div>
+<div class="err" id="errEl" style="display:none"></div>
 
-<div id="loadingEl" class="spinner" style="display:none">
-  <div class="spinner-icon">⚡</div>
-  <div style="font-size:14px;margin-top:10px" id="loadingMsg">Loading...</div>
-  <div style="font-size:12px;color:#4b5563;margin-top:4px" id="loadingSub"></div>
-  <div class="progress-log" id="debugLog"></div>
+<div class="spinner" id="loadEl" style="display:none">
+  <div class="spin">⚡</div>
+  <div style="font-size:14px;margin-top:10px" id="loadMsg">Loading...</div>
+  <div style="font-size:12px;color:#4b5563;margin-top:4px" id="loadSub"></div>
+  <div class="plog" id="plog"></div>
 </div>
 
-<div id="welcomeEl" class="section" style="text-align:center;padding:50px">
+<div class="welcome" id="welcomeEl">
   <div style="font-size:48px;margin-bottom:14px">⚡</div>
   <div style="font-weight:700;font-size:18px;margin-bottom:8px">Ampeco Dashboard</div>
-  <div style="color:#8892a4;font-size:14px;margin-bottom:22px">Select a month and click Load Data to get started.</div>
+  <div style="color:#8892a4;font-size:14px;margin-bottom:22px">Select a month and click Load Data.</div>
   <button class="btn" onclick="loadAll()">🔌 Load Data</button>
 </div>
 
-<div id="mainContent" style="display:none">
+<div id="main" style="display:none">
   <div class="tabs" id="tabsEl"></div>
-  <input type="text" class="search" id="searchBox" placeholder="Search..." oninput="renderTab()" style="display:none" />
+  <input type="text" class="search" id="searchBox" oninput="renderTab()" style="display:none" placeholder="Search..."/>
   <div id="tabContent"></div>
 </div>
 
 <script>
-'use strict';
-
-// ── Constants ────────────────────────────────────────────────────
 const PROXY = '/api/ampeco';
+const SC = {available:'#00c2a8',charging:'#3b82f6',faulted:'#ef4444',unavailable:'#f59e0b',preparing:'#a78bfa',finishing:'#06b6d4',reserved:'#f97316',online:'#00c2a8',offline:'#8892a4',active:'#3b82f6',pending:'#f59e0b',finished:'#10b981',completed:'#10b981',unknown:'#8892a4'};
 const TABS = [
-  { key: 'overview',      label: 'Overview' },
-  { key: 'chargepoints',  label: 'Charge Points',  dk: 'chargePoints' },
-  { key: 'evses',         label: 'EVSEs',          dk: 'evses' },
-  { key: 'sessions',      label: 'Sessions',       dk: 'sessions' },
-  { key: 'locations',     label: 'Locations',      dk: 'locations' },
-  { key: 'users',         label: 'Users',          dk: 'users' },
-  { key: 'transactions',  label: 'Transactions',   dk: 'transactions' },
+  {key:'overview',label:'Overview'},
+  {key:'chargepoints',label:'Charge Points',dk:'chargePoints'},
+  {key:'evses',label:'EVSEs',dk:'evses'},
+  {key:'sessions',label:'Sessions',dk:'sessions'},
+  {key:'locations',label:'Locations',dk:'locations'},
+  {key:'users',label:'Users',dk:'users'},
+  {key:'transactions',label:'Transactions',dk:'transactions'},
 ];
-const SC = { available:'#00c2a8', charging:'#3b82f6', faulted:'#ef4444', unavailable:'#f59e0b', preparing:'#a78bfa', finishing:'#06b6d4', reserved:'#f97316', online:'#00c2a8', offline:'#8892a4', active:'#3b82f6', pending:'#f59e0b', finished:'#10b981', completed:'#10b981', unknown:'#8892a4' };
 
-// ── State ────────────────────────────────────────────────────────
-var allData = null;
-var currentTab = 'overview';
+let allData = null, currentTab = 'overview';
 
-// ── Utility ──────────────────────────────────────────────────────
-function n(v) { if (!v) return '–'; if (typeof v === 'string') return v; return v.en || v[Object.keys(v)[0]] || '–'; }
-function fmt(d) { return d ? new Date(d).toLocaleString() : '–'; }
-function fmtDate(d) { return d ? new Date(d).toLocaleDateString() : '–'; }
-function money(v) { return (v != null && v !== '') ? '$' + parseFloat(v).toFixed(2) : '–'; }
-function badgeHtml(s) { var k=(s||'unknown').toLowerCase(), c=SC[k]||'#8892a4'; return '<span class="badge-status" style="background:'+c+'22;color:'+c+';border:1px solid '+c+'44">'+( s||'unknown')+'</span>'; }
+// ── Helpers ───────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const n = v => !v ? '–' : typeof v === 'string' ? v : v.en || v[Object.keys(v)[0]] || '–';
+const fmt = d => d ? new Date(d).toLocaleString() : '–';
+const fmtD = d => d ? new Date(d).toLocaleDateString() : '–';
+const money = v => v != null && v !== '' ? '$' + parseFloat(v).toFixed(2) : '–';
+
+function badge(s) {
+  const k = (s||'unknown').toLowerCase();
+  const c = SC[k] || '#8892a4';
+  const el = document.createElement('span');
+  el.className = 'bs';
+  el.style.cssText = `background:${c}22;color:${c};border:1px solid ${c}44`;
+  el.textContent = s || 'unknown';
+  return el;
+}
+
 function log(msg, cls) {
-  var el = document.getElementById('debugLog');
-  var d = document.createElement('div');
-  d.className = 'log-line' + (cls ? ' ' + cls : '');
+  const el = $('plog'), d = document.createElement('div');
+  d.className = 'll' + (cls ? ' ' + cls : '');
   d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
-  el.appendChild(d);
-  el.scrollTop = el.scrollHeight;
+  el.appendChild(d); el.scrollTop = el.scrollHeight;
 }
 
-// ── Cache ────────────────────────────────────────────────────────
-// Stored in localStorage keyed by "ampeco_month_YYYY-MM"
-// localStorage is domain-scoped to joltcharge-proxy.vercel.app
-// and persists across all deployments of this app on that domain.
-function cacheKey(ym) { return 'ampeco_month_' + ym; }
+// ── Cache ─────────────────────────────────────────────────────────
+const cKey = ym => 'ampeco_v2_' + ym;
 
-function saveToCache(ym, data, lastFetchedAt) {
+function saveCache(ym, data, lastFetch) {
   try {
-    var payload = JSON.stringify({ v: 1, savedAt: new Date().toISOString(), lastFetchedAt: lastFetchedAt, data: data });
-    localStorage.setItem(cacheKey(ym), payload);
-    var readback = localStorage.getItem(cacheKey(ym));
-    var ok = !!readback;
-    log('💾 Cache save ' + ym + ': ' + (ok ? '✅ verified (' + Math.round(payload.length/1024) + 'KB)' : '❌ readback failed'), ok ? 'log-ok' : 'log-err');
-    document.getElementById('cacheStatus').textContent = '💾 Cached: ' + ym;
+    // Only store what's needed — summary stats + small sample
+    const payload = {
+      v: 2, savedAt: new Date().toISOString(), lastFetch,
+      locations:    data.locations    || [],
+      chargePoints: data.chargePoints || [],
+      evses:        data.evses        || [],
+      users:        data.users        || [],
+      sessCount:    (data.sessions||[]).length,
+      txnCount:     (data.transactions||[]).length,
+      totalEnergy:  (data.sessions||[]).reduce((a,s) => a + parseFloat(s.energy||0), 0),
+      totalRevenue: (data.transactions||[]).reduce((a,t) => a + parseFloat(t.totalAmount||t.amount||0), 0),
+      sessSample:   (data.sessions||[]).slice(0, 200),
+      txnSample:    (data.transactions||[]).slice(0, 200),
+    };
+    const str = JSON.stringify(payload);
+    localStorage.setItem(cKey(ym), str);
+    log('💾 Cached ' + ym + ' (' + Math.round(str.length/1024) + 'KB)', 'lok');
+    $('cacheTxt').textContent = '💾 ' + Math.round(str.length/1024) + 'KB cached';
+    updateMonthLabels();
   } catch(e) {
-    log('⚠️ Cache write failed: ' + e.message + (e.name === 'QuotaExceededError' ? ' (storage full!)' : ''), 'log-err');
+    log('⚠️ Cache failed: ' + e.message, 'lerr');
   }
 }
 
-function loadFromCache(ym) {
+function loadCache(ym) {
   try {
-    var raw = localStorage.getItem(cacheKey(ym));
-    if (!raw) { console.log('[Cache] No entry for', ym); return null; }
-    var parsed = JSON.parse(raw);
-    console.log('[Cache] Loaded', ym, '| savedAt:', parsed.savedAt, '| sessions:', (parsed.data && parsed.data.sessions) ? parsed.data.sessions.length : 0);
-    return parsed;
-  } catch(e) {
-    console.error('[Cache] Load error for', ym, e);
-    return null;
-  }
+    const raw = localStorage.getItem(cKey(ym));
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
 }
 
 function clearCache(ym) {
-  localStorage.removeItem(cacheKey(ym));
-  log('🗑️ Cleared cache for ' + ym);
+  localStorage.removeItem(cKey(ym));
+  log('🗑️ Cleared ' + ym);
+  updateMonthLabels();
 }
 
-function mergeRecords(existing, incoming) {
-  var map = {};
-  (existing || []).forEach(function(r) { map[String(r.id)] = r; });
-  (incoming || []).forEach(function(r) { map[String(r.id)] = r; }); // newer wins
-  return Object.values(map);
-}
-
-function withOverlap(isoString) {
-  var d = new Date(isoString);
-  d.setTime(d.getTime() - 2 * 3600 * 1000); // 2h overlap
-  return d.toISOString().slice(0, 10); // YYYY-MM-DD is safest for Ampeco filters
+function cacheToAllData(c, ym) {
+  return {
+    _month: ym,
+    locations:    c.locations    || [],
+    chargePoints: c.chargePoints || [],
+    evses:        c.evses        || [],
+    users:        c.users        || [],
+    sessions:     c.sessSample   || [],
+    transactions: c.txnSample    || [],
+    activeSessions: [],
+    _sessCount:   c.sessCount   || 0,
+    _txnCount:    c.txnCount    || 0,
+    _totalEnergy: c.totalEnergy || 0,
+    _totalRevenue:c.totalRevenue|| 0,
+  };
 }
 
 // ── Month helpers ─────────────────────────────────────────────────
-function currentYM() {
-  var now = new Date();
-  return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+function curYM() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
 }
-
-function getSelectedMonth() { return document.getElementById('monthSelect').value; }
+function getYM() { return $('monthSel').value; }
+function isPast(ym) { return ym < curYM(); }
 
 function monthRange(ym) {
-  var parts = ym.split('-'), y = parseInt(parts[0]), m = parseInt(parts[1]);
-  var lastDay = new Date(y, m, 0).getDate();
-  return { from: ym + '-01', to: ym + '-' + String(lastDay).padStart(2,'0') };
+  const [y,m] = ym.split('-').map(Number);
+  return { from: ym+'-01', to: ym+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0') };
 }
 
-function isFinalizedMonth(ym) { return ym < currentYM(); }
-
 function buildMonthOptions() {
-  var sel = document.getElementById('monthSelect');
+  const sel = $('monthSel');
   sel.innerHTML = '';
-  var now = new Date();
-  for (var i = 0; i < 12; i++) {
-    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    var ym = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-    var label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
-    var opt = document.createElement('option');
+  const now = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const ym = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    const opt = document.createElement('option');
     opt.value = ym;
-    opt.textContent = label;
-    if (i === 0) opt.selected = true;
+    opt.textContent = d.toLocaleString('default',{month:'long',year:'numeric'});
+    if (i===0) opt.selected = true;
     sel.appendChild(opt);
   }
-  updateMonthLabels();
-
-  // Cache diagnostic
+  // Check localStorage availability
   try {
-    localStorage.setItem('ampeco_test', '1');
-    var ok = localStorage.getItem('ampeco_test') === '1';
+    localStorage.setItem('ampeco_test','1');
     localStorage.removeItem('ampeco_test');
-    var keys = [];
-    for (var j = 0; j < localStorage.length; j++) {
-      var k = localStorage.key(j);
-      if (k && k.startsWith('ampeco_month_')) keys.push(k);
-    }
-    console.log('[Ampeco Cache] localStorage available:', ok, '| cached months:', keys);
-    document.getElementById('cacheStatus').textContent = ok
-      ? '💾 Cache: ' + (keys.length ? keys.map(function(k){ return k.replace('ampeco_month_',''); }).join(', ') : 'empty')
-      : '⚠️ localStorage unavailable';
-  } catch(e) {
-    document.getElementById('cacheStatus').textContent = '⚠️ localStorage error: ' + e.message;
-    console.error('[Ampeco Cache] localStorage error:', e);
-  }
+    const keys = [];
+    for (let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ampeco_v2_'))keys.push(k.replace('ampeco_v2_',''));}
+    $('cacheTxt').textContent = keys.length ? '💾 Cached: '+keys.join(', ') : '💾 Cache empty';
+  } catch(e) { $('cacheTxt').textContent = '⚠️ No localStorage'; }
+  updateMonthLabels();
 }
 
 function updateMonthLabels() {
-  var sel = document.getElementById('monthSelect');
-  for (var i = 0; i < sel.options.length; i++) {
-    var opt = sel.options[i];
-    var ym = opt.value;
-    // Strip old indicators
-    opt.textContent = opt.textContent.replace(/ [✓○]$/, '');
-    if (isFinalizedMonth(ym)) {
-      opt.textContent += loadFromCache(ym) ? ' ✓' : ' ○';
-    }
+  const sel = $('monthSel');
+  for (let i=0;i<sel.options.length;i++) {
+    const opt = sel.options[i], ym = opt.value;
+    opt.textContent = opt.textContent.replace(/ [✓○]$/,'');
+    if (isPast(ym)) opt.textContent += loadCache(ym) ? ' ✓' : ' ○';
   }
-  // Show clear cache button only for cached past months
-  var ym = getSelectedMonth();
-  var showClear = isFinalizedMonth(ym) && !!loadFromCache(ym);
-  document.getElementById('clearCacheBtn').style.display = showClear ? '' : 'none';
+  const ym = getYM();
+  $('clearBtn').style.display = (isPast(ym) && loadCache(ym)) ? '' : 'none';
 }
 
-function clearCurrentCache() {
-  clearCache(getSelectedMonth());
-  updateMonthLabels();
-  loadAll();
-}
+function clearCurrentCache() { clearCache(getYM()); loadAll(); }
 
 function onMonthChange() {
   updateMonthLabels();
-  var ym = getSelectedMonth();
-  var cached = loadFromCache(ym);
-  if (cached) {
-    log('📦 Loading ' + ym + ' from cache instantly', 'log-ok');
-    allData = Object.assign(expandFromCache(cached), { _month: ym });
+  const ym = getYM();
+  const c = loadCache(ym);
+  if (c) {
+    log('📦 Loaded '+ym+' from cache instantly', 'lok');
+    allData = cacheToAllData(c, ym);
     showDashboard();
-    backgroundRefresh(ym);
+    backgroundRefresh(ym, c);
   } else {
     loadAll();
   }
 }
 
 // ── Fetch ─────────────────────────────────────────────────────────
-async function fetchPages(path, maxPages) {
-  var all = [], page = 1, lastPage = 1;
-  maxPages = maxPages || 50;
+async function fetchPages(path, max) {
+  max = max || 50;
+  let all = [], page = 1, last = 1;
   do {
-    var sep = path.includes('?') ? '&' : '?';
-    var fullPath = path + sep + 'per_page=100&page=' + page;
-    // Pass the entire path+query as the ?path= param — proxy will forward as-is
-    var url = PROXY + '?path=' + encodeURIComponent(fullPath);
-    var res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    var json = await res.json();
-    var items = json.data || json.items || (Array.isArray(json) ? json : []);
+    const sep = path.includes('?') ? '&' : '?';
+    const url = PROXY + '?path=' + encodeURIComponent(path + sep + 'per_page=100&page='+page);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const j = await res.json();
+    const items = j.data || j.items || (Array.isArray(j)?j:[]);
     all = all.concat(items);
-    lastPage = (json.meta && json.meta.last_page) ? json.meta.last_page : 1;
-    document.getElementById('loadingSub').textContent = 'Page ' + page + ' of ' + Math.min(lastPage, maxPages);
+    last = (j.meta&&j.meta.last_page) ? j.meta.last_page : 1;
+    $('loadSub').textContent = 'Page '+page+' of '+Math.min(last,max);
     page++;
-  } while (page <= lastPage && page <= maxPages);
+  } while (page<=last && page<=max);
   return all;
 }
 
-async function backgroundRefresh(ym) {
-  // Silently fetch only live + incremental data, merge into allData, re-render
-  var cached = loadFromCache(ym);
-  var now = new Date().toISOString();
-  var range = monthRange(ym);
-  var overlapFrom = (cached && cached.lastFetchedAt) ? withOverlap(cached.lastFetchedAt) : range.from;
-  var cacheAgeHours = cached ? (Date.now() - new Date(cached.savedAt)) / 3600000 : 9999;
-
-  // Show subtle "updating..." indicator
-  document.getElementById('recordCount').textContent += ' · updating...';
-
-  try {
-    // Always fetch live
-    var last24h = new Date(Date.now() - 24*3600*1000).toISOString().slice(0,10);
-    var recentSess = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]=' + last24h + '&sort=-startedAt', 5);
-    allData.activeSessions = recentSess.filter(function(s){ return s.status === 'active' || s.status === 'pending'; });
-    allData.chargePoints   = await fetchPages('/resources/charge-points/v1.0', 100);
-
-    // Incremental sessions + transactions
-    var freshSess = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+overlapFrom+'&filter[startedAt][to]='+range.to, 50);
-    var freshTxns = await fetchPages('/resources/transactions/v1.0?filter[date][from]='+overlapFrom+'&filter[date][to]='+range.to, 100);
-    allData.sessions      = mergeRecords(allData.sessions||[], freshSess);
-    allData.transactions  = mergeRecords(allData.transactions||[], freshTxns);
-
-    // Re-fetch static data if cache is old
-    if (cacheAgeHours > 24) {
-      allData.locations = await fetchPages('/resources/locations/v1.0', 100);
-      allData.evses     = await fetchPages('/resources/evses/v1.0', 100);
-      allData.users     = await fetchPages('/resources/users/v1.0', 100);
-    }
-
-    // Save updated cache
-    saveToCache(ym, { locations:allData.locations, chargePoints:allData.chargePoints, evses:allData.evses, sessions:allData.sessions, transactions:allData.transactions, users:allData.users }, now);
-    showDashboard();
-  } catch(e) {
-    console.error('Background refresh error:', e);
-    showDashboard(); // still show cached data even if refresh failed
-  }
+function mergeById(existing, incoming) {
+  const map = {};
+  (existing||[]).forEach(r => map[String(r.id)] = r);
+  (incoming||[]).forEach(r => map[String(r.id)] = r);
+  return Object.values(map);
 }
+
+// ── Main load ─────────────────────────────────────────────────────
 async function loadAll() {
-  var ym = getSelectedMonth();
-  var range = monthRange(ym);
-  var now = new Date().toISOString();
-  var cached = loadFromCache(ym);
-  var isIncremental = !!cached;
-  var cacheAgeHours = cached ? (Date.now() - new Date(cached.savedAt)) / 3600000 : 9999;
-  var overlapFrom = (cached && cached.lastFetchedAt) ? withOverlap(cached.lastFetchedAt) : range.from;
+  const ym = getYM(), now = new Date().toISOString();
+  const range = monthRange(ym);
+  const cached = loadCache(ym);
+  const isInc = !!cached;
+  const cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
+  const fromDt = cached&&cached.lastFetch ? (() => { const d=new Date(cached.lastFetch); d.setTime(d.getTime()-2*3600000); return d.toISOString().slice(0,10); })() : range.from;
 
-  // Show loading
-  document.getElementById('welcomeEl').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'none';
-  document.getElementById('errorEl').style.display = 'none';
-  document.getElementById('loadingEl').style.display = 'block';
-  document.getElementById('debugLog').innerHTML = '';
-  document.getElementById('loadBtn').disabled = true;
-  document.getElementById('statusBadge').style.display = 'none';
+  $('welcomeEl').style.display = 'none';
+  $('main').style.display = 'none';
+  $('errEl').style.display = 'none';
+  $('loadEl').style.display = 'block';
+  $('plog').innerHTML = '';
+  $('loadBtn').disabled = true;
+  $('badge').style.display = 'none';
 
-  if (isIncremental) {
-    var ageStr = cacheAgeHours < 1 ? Math.round(cacheAgeHours*60)+'m' : Math.round(cacheAgeHours)+'h';
-    log('📦 Cache found (' + ageStr + ' old) — incremental update from ' + overlapFrom, 'log-ok');
+  log((isInc ? '📦 Incremental update from '+fromDt : '🆕 Full fetch for '+ym), 'lok');
+
+  const data = isInc ? {
+    locations:    cached.locations    || [],
+    chargePoints: cached.chargePoints || [],
+    evses:        cached.evses        || [],
+    users:        cached.users        || [],
+    sessions:     cached.sessSample   || [],
+    transactions: cached.txnSample    || [],
+    activeSessions: [],
+  } : { locations:[],chargePoints:[],evses:[],sessions:[],transactions:[],activeSessions:[] };
+
+  const jobs = [
+    {key:'chargePoints', label:'Charge Points', path:'/resources/charge-points/v1.0', max:100},
+    {key:'sessions',     label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, max:100, merge:isInc},
+    {key:'transactions', label:'Transactions',  path:'/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, max:100, merge:isInc},
+  ];
+  if (!isInc || cacheAge>24) {
+    jobs.push({key:'locations',label:'Locations',path:'/resources/locations/v1.0',max:100});
+    jobs.push({key:'evses',    label:'EVSEs',    path:'/resources/evses/v1.0',    max:100});
+    jobs.push({key:'users',    label:'Users',    path:'/resources/users/v1.0',    max:100});
   } else {
-    log('🆕 No cache — full fetch for ' + ym, 'log-ok');
+    log('⏭️ Locations/EVSEs/Users from cache (< 24h old)', 'lok');
   }
 
-  var data = isIncremental ? JSON.parse(JSON.stringify(cached.data)) : { locations:[], chargePoints:[], evses:[], sessions:[], transactions:[], users:[], activeSessions:[] };
-
-  // Define what to fetch
-  var jobs = [];
-
-  // Always fetch live status
-  // Active sessions — fetch last 24h and filter client-side (status filter not supported by API)
-  var last24h = new Date(Date.now() - 24*3600*1000).toISOString().slice(0,10);
-  var ACTIVE_PATH = '/resources/sessions/v1.0?filter[startedAt][from]=' + last24h + '&sort=-startedAt';
-  jobs.push({ key:'activeSessions', label:'Active Sessions', path: ACTIVE_PATH, max:5, merge:false, postFilter: function(items){ return items.filter(function(s){ return s.status === 'active' || s.status === 'pending'; }); } });
-  jobs.push({ key:'chargePoints',   label:'Charge Points',   path:'/resources/charge-points/v1.0', max:100, merge:false });
-
-  // Incremental sessions & transactions (from overlap point)
-  jobs.push({ key:'sessions',      label:'Sessions',      path:'/resources/sessions/v1.0?filter[startedAt][from]='+overlapFrom+'&filter[startedAt][to]='+range.to, max:100, merge:isIncremental });
-  jobs.push({ key:'transactions',  label:'Transactions',  path:'/resources/transactions/v1.0?filter[date][from]='+overlapFrom+'&filter[date][to]='+range.to, max:100, merge:isIncremental });
-
-  // Static data — re-fetch if no cache or cache > 24h old
-  if (!isIncremental || cacheAgeHours > 24) {
-    jobs.push({ key:'locations', label:'Locations', path:'/resources/locations/v1.0', max:100, merge:false });
-    jobs.push({ key:'evses',     label:'EVSEs',     path:'/resources/evses/v1.0',     max:100, merge:false });
-    jobs.push({ key:'users',     label:'Users',     path:'/resources/users/v1.0',     max:100, merge:false });
-  } else {
-    log('⏭️ Locations / EVSEs / Users unchanged (cache < 24h)', 'log-ok');
-  }
-
-  // Execute jobs
-  for (var i = 0; i < jobs.length; i++) {
-    var job = jobs[i];
+  for (const job of jobs) {
     try {
-      document.getElementById('loadingMsg').textContent = 'Fetching ' + job.label + '...';
-      var fresh = await fetchPages(job.path, job.max);
-      var result = job.postFilter ? job.postFilter(fresh) : fresh;
+      $('loadMsg').textContent = 'Fetching '+job.label+'...';
+      const fresh = await fetchPages(job.path, job.max);
       if (job.merge) {
-        var before = (data[job.key] || []).length;
-        data[job.key] = mergeRecords(data[job.key] || [], result);
-        log('✅ ' + job.label + ': +' + (data[job.key].length - before) + ' new (' + data[job.key].length + ' total)', 'log-ok');
+        const before = data[job.key].length;
+        data[job.key] = mergeById(data[job.key], fresh);
+        log('✅ '+job.label+': +'+(data[job.key].length-before)+' new ('+data[job.key].length+' total)', 'lok');
       } else {
-        data[job.key] = result;
-        log('✅ ' + job.label + ': ' + result.length + ' records', 'log-ok');
+        data[job.key] = fresh;
+        log('✅ '+job.label+': '+fresh.length, 'lok');
       }
     } catch(e) {
-      log('❌ ' + job.label + ': ' + e.message, 'log-err');
-      if (!data[job.key]) data[job.key] = [];
+      log('❌ '+job.label+': '+e.message, 'lerr');
     }
   }
 
-  // Save to cache (all months — enables incremental on next load)
-  var toCache = { locations:data.locations, chargePoints:data.chargePoints, evses:data.evses, sessions:data.sessions, transactions:data.transactions, users:data.users };
-  saveToCache(ym, toCache, now);
+  // Active sessions — last 24h, filter client-side
+  try {
+    $('loadMsg').textContent = 'Fetching active sessions...';
+    const last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
+    const recent = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
+    data.activeSessions = recent.filter(s => s.status==='active'||s.status==='pending');
+    log('✅ Active sessions: '+data.activeSessions.length, 'lok');
+  } catch(e) { log('❌ Active sessions: '+e.message,'lerr'); data.activeSessions=[]; }
 
-  allData = data;
-  allData._month = ym;
-
+  saveCache(ym, data, now);
+  allData = Object.assign(data, {_month:ym});
   showDashboard();
 }
 
+async function backgroundRefresh(ym, cached) {
+  const now = new Date().toISOString();
+  const range = monthRange(ym);
+  const fromDt = cached&&cached.lastFetch ? (() => { const d=new Date(cached.lastFetch); d.setTime(d.getTime()-2*3600000); return d.toISOString().slice(0,10); })() : range.from;
+  const cacheAge = cached ? (Date.now()-new Date(cached.savedAt))/3600000 : 9999;
+
+  try {
+    const [freshCP, freshSess, freshTxns] = await Promise.all([
+      fetchPages('/resources/charge-points/v1.0', 100),
+      fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+fromDt+'&filter[startedAt][to]='+range.to, 100),
+      fetchPages('/resources/transactions/v1.0?filter[date][from]='+fromDt+'&filter[date][to]='+range.to, 100),
+    ]);
+    allData.chargePoints  = freshCP;
+    allData.sessions      = mergeById(allData.sessions, freshSess);
+    allData.transactions  = mergeById(allData.transactions, freshTxns);
+
+    if (cacheAge > 24) {
+      const [locs, evses, users] = await Promise.all([
+        fetchPages('/resources/locations/v1.0', 100),
+        fetchPages('/resources/evses/v1.0', 100),
+        fetchPages('/resources/users/v1.0', 100),
+      ]);
+      allData.locations = locs; allData.evses = evses; allData.users = users;
+    }
+
+    const last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
+    const recent = await fetchPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&sort=-startedAt', 5);
+    allData.activeSessions = recent.filter(s => s.status==='active'||s.status==='pending');
+
+    delete allData._sessCount; delete allData._txnCount;
+    delete allData._totalEnergy; delete allData._totalRevenue;
+    saveCache(ym, allData, now);
+    showDashboard();
+  } catch(e) { console.error('Background refresh error:', e); }
+}
+
+// ── Show dashboard ────────────────────────────────────────────────
 function showDashboard() {
   try {
-    var total = 0;
-    Object.keys(allData).forEach(function(k) { if (Array.isArray(allData[k])) total += allData[k].length; });
-    var cached = loadFromCache(allData._month);
-    var ageMin = cached ? Math.round((Date.now() - new Date(cached.savedAt)) / 60000) : 0;
-    var ageStr = ageMin < 60 ? ageMin + 'm ago' : Math.round(ageMin/60) + 'h ago';
-
-    document.getElementById('recordCount').textContent = total.toLocaleString() + ' · synced ' + ageStr;
-    document.getElementById('statusBadge').style.display = '';
-    document.getElementById('loadingEl').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    document.getElementById('loadBtn').textContent = '🔄 Refresh';
-    document.getElementById('loadBtn').disabled = false;
+    const total = Object.values(allData).reduce((a,b)=>Array.isArray(b)?a+b.length:a, 0);
+    const c = loadCache(allData._month);
+    const ageMin = c ? Math.round((Date.now()-new Date(c.savedAt))/60000) : 0;
+    const ageStr = ageMin<60 ? ageMin+'m ago' : Math.round(ageMin/60)+'h ago';
+    $('badgeTxt').textContent = total.toLocaleString()+' · synced '+ageStr;
+    $('badge').style.display = '';
+    $('loadEl').style.display = 'none';
+    $('welcomeEl').style.display = 'none';
+    $('main').style.display = 'block';
+    $('loadBtn').textContent = '🔄 Refresh';
+    $('loadBtn').disabled = false;
     updateMonthLabels();
     buildTabs();
-    switchTab('overview');
+    switchTab(currentTab);
   } catch(e) {
-    document.getElementById('loadingEl').style.display = 'none';
-    document.getElementById('loadBtn').disabled = false;
-    document.getElementById('loadBtn').textContent = '🔄 Refresh';
-    document.getElementById('errorEl').textContent = '⚠️ Error showing dashboard: ' + e.message + '\n' + e.stack;
-    document.getElementById('errorEl').style.display = 'block';
-    console.error(e);
+    $('loadEl').style.display = 'none';
+    $('loadBtn').disabled = false;
+    $('loadBtn').textContent = '🔄 Refresh';
+    $('errEl').textContent = '⚠️ '+e.message+'\n'+e.stack;
+    $('errEl').style.display = 'block';
   }
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────
 function buildTabs() {
-  document.getElementById('tabsEl').innerHTML = TABS.map(function(t) {
-    var count = t.dk ? ((allData[t.dk]||[]).length || '') : '';
-    var countHtml = count ? '<span class="tab-count">' + count.toLocaleString() + '</span>' : '';
-    return '<button class="tab ' + (t.key===currentTab?'active':'') + '" onclick="switchTab(\''+t.key+'\')">' + t.label + countHtml + '</button>';
-  }).join('');
+  const el = $('tabsEl'); el.innerHTML = '';
+  TABS.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab'+(t.key===currentTab?' active':'');
+    btn.onclick = () => switchTab(t.key);
+    btn.textContent = t.label;
+    if (t.dk) {
+      const cnt = (allData[t.dk]||[]).length;
+      if (cnt) { const sp=document.createElement('span'); sp.className='tab-count'; sp.textContent=cnt.toLocaleString(); btn.appendChild(sp); }
+    }
+    el.appendChild(btn);
+  });
 }
 
 function switchTab(key) {
   currentTab = key;
-  document.getElementById('searchBox').value = '';
-  document.getElementById('searchBox').style.display = key === 'overview' ? 'none' : 'block';
-  document.getElementById('searchBox').placeholder = 'Search ' + key + '...';
-  buildTabs();
-  renderTab();
+  $('searchBox').style.display = key==='overview' ? 'none' : 'block';
+  $('searchBox').placeholder = 'Search '+key+'...';
+  $('searchBox').value = '';
+  buildTabs(); renderTab();
 }
 
+function getQ() { return $('searchBox').value.toLowerCase(); }
 function filterArr(arr, fields) {
-  var q = document.getElementById('searchBox').value.toLowerCase();
-  if (!q) return arr;
-  return arr.filter(function(item) { return fields.some(function(f) { return String(item[f]||'').toLowerCase().includes(q); }); });
+  const q = getQ(); if (!q) return arr;
+  return arr.filter(item => fields.some(f => String(item[f]||'').toLowerCase().includes(q)));
 }
+
+// ── Render helpers ────────────────────────────────────────────────
+function makeCard(icon, label, value, color, sub) {
+  const d = document.createElement('div'); d.className = 'card';
+  d.innerHTML = `<div class="card-icon">${icon}</div><div class="card-label">${label}</div><div class="card-value" style="color:${color}">${value}</div>${sub?`<div class="card-sub">${sub}</div>`:''}`;
+  return d;
+}
+
+function makeTable(headers, rows) {
+  const wrap = document.createElement('div'); wrap.className = 'tbl-wrap';
+  const tbl = document.createElement('table');
+  const thead = document.createElement('thead'), hr = document.createElement('tr');
+  headers.forEach(h => { const th=document.createElement('th'); th.textContent=h; hr.appendChild(th); });
+  thead.appendChild(hr); tbl.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  if (!rows.length) {
+    const tr=document.createElement('tr'), td=document.createElement('td');
+    td.colSpan=headers.length; td.className='empty'; td.textContent='No data'; tr.appendChild(td); tbody.appendChild(tr);
+  } else { rows.forEach(r => tbody.appendChild(r)); }
+  tbl.appendChild(tbody); wrap.appendChild(tbl); return wrap;
+}
+
+function makeRow(cells) {
+  const tr = document.createElement('tr');
+  cells.forEach(c => { if (c instanceof HTMLElement) { tr.appendChild(c); } else { const td=document.createElement('td'); if (typeof c==='object'&&c.text!==undefined) { td.textContent=c.text; if(c.cls)td.className=c.cls; } else td.textContent=c||'–'; tr.appendChild(td); } });
+  return tr;
+}
+function cell(text, cls) { const td=document.createElement('td'); td.textContent=text||'–'; if(cls)td.className=cls; return td; }
+function badgeCell(s) { const td=document.createElement('td'); td.appendChild(badge(s)); return td; }
 
 // ── Render ────────────────────────────────────────────────────────
 function renderTab() {
-  var el = document.getElementById('tabContent');
+  const el = $('tabContent'); el.innerHTML = '';
   try {
-    var cp    = allData.chargePoints  || [];
-    var locs  = allData.locations     || [];
-    var active= allData.activeSessions|| [];
-    var sess  = allData.sessions      || [];
-    var usrs  = allData.users         || [];
-    var txns  = allData.transactions  || [];
-    var evses = allData.evses         || [];
-    var ym    = allData._month || getSelectedMonth();
-    var monthLabel = new Date(ym + '-15').toLocaleString('default', { month:'long', year:'numeric' });
+    const cp=allData.chargePoints||[], locs=allData.locations||[], active=allData.activeSessions||[];
+    const sess=allData.sessions||[], usrs=allData.users||[], txns=allData.transactions||[], evses=allData.evses||[];
+    const ym=allData._month||getYM();
+    const mLabel = new Date(ym+'-15').toLocaleString('default',{month:'long',year:'numeric'});
 
-    if (currentTab === 'overview') {
-      var cpOnline = cp.filter(function(c){ return ['online','available','charging'].indexOf((c.connectivity_status||c.status||'').toLowerCase()) > -1; }).length;
-      var totalEnergy = sess.reduce(function(a,s){ return a + parseFloat(s.energy||0); }, 0) / 1000;
-      var totalRev = txns.reduce(function(a,t){
-        return a + parseFloat(t.totalAmount||t.amount||0);
-      }, 0);
-      var statusCounts = cp.reduce(function(a,c){ var s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; }, {});
-      var locSess = sess.reduce(function(a,s){ var id=s.locationId||s.location_id; if(id){a[id]=(a[id]||0)+1;} return a; }, {});
-      var topLocs = Object.entries(locSess).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
-      var maxSess = topLocs.length ? topLocs[0][1] : 1;
+    if (currentTab==='overview') {
+      const cpOnline = cp.filter(c=>['online','available','charging'].includes((c.connectivity_status||c.status||'').toLowerCase())).length;
+      const sessCount = allData._sessCount!=null ? allData._sessCount : sess.length;
+      const txnCount  = allData._txnCount !=null ? allData._txnCount  : txns.length;
+      const energy    = allData._totalEnergy!=null ? allData._totalEnergy/1000 : sess.reduce((a,s)=>a+parseFloat(s.energy||0),0)/1000;
+      const revenue   = allData._totalRevenue!=null ? allData._totalRevenue : txns.reduce((a,t)=>a+parseFloat(t.totalAmount||t.amount||0),0);
 
-      el.innerHTML =
-        '<div class="cards">' +
-          card('🔌','Charge Points', cp.length.toLocaleString(), '#00c2a8', cpOnline+' active') +
-          card('📍','Locations', locs.length.toLocaleString(), '#3b82f6') +
-          card('⚡','Active Now', active.length, '#a78bfa') +
-          card('📋','Sessions '+monthLabel, sessCount.toLocaleString(), '#06b6d4') +
-          card('🔋','Energy '+monthLabel+' (kWh)', totalEnergy.toFixed(1), '#f59e0b') +
-          card('💰','Revenue '+monthLabel, '
-          card('👤','Total Users', usrs.length.toLocaleString(), '#f97316') +
-        '</div>' +
-        (active.length ? activeSessTable(active) : '') +
-        (Object.keys(statusCounts).length ? statusSection(statusCounts) : '') +
-        (topLocs.length ? topLocsChart(topLocs, locs, maxSess, monthLabel) : '') +
-        (locs.length ? locsGrid(locs.slice(0,24)) : '');
+      const cards = document.createElement('div'); cards.className='cards';
+      [
+        makeCard('🔌','Charge Points',cp.length.toLocaleString(),'#00c2a8',cpOnline+' active'),
+        makeCard('📍','Locations',locs.length.toLocaleString(),'#3b82f6'),
+        makeCard('⚡','Active Now',active.length,'#a78bfa'),
+        makeCard('📋','Sessions '+mLabel,sessCount.toLocaleString(),'#06b6d4'),
+        makeCard('🔋','Energy '+mLabel+' kWh',energy.toFixed(1),'#f59e0b'),
+        makeCard('💰','Revenue '+mLabel,'$'+revenue.toFixed(2),'#10b981'),
+        makeCard('👤','Total Users',usrs.length.toLocaleString(),'#f97316'),
+      ].forEach(c=>cards.appendChild(c));
+      el.appendChild(cards);
+
+      // Active sessions table
+      if (active.length) {
+        const sec=document.createElement('div'); sec.className='section';
+        const title=document.createElement('div'); title.className='section-title'; title.textContent='⚡ Live Active Sessions ('+active.length+')'; sec.appendChild(title);
+        const rows=active.map(s=>makeRow([cell(s.id,'mono'),cell(s.chargePointId||'–','muted'),cell(s.userId||'–','muted'),cell(fmt(s.startedAt),'muted'),cell((parseFloat(s.energy||0)/1000).toFixed(2))]));
+        sec.appendChild(makeTable(['Session','Charge Point','User','Started','kWh'],rows)); el.appendChild(sec);
+      }
+
+      // Status breakdown
+      const statusCounts = cp.reduce((a,c)=>{ const s=c.connectivity_status||c.status||'unknown'; a[s]=(a[s]||0)+1; return a; },{});
+      if (Object.keys(statusCounts).length) {
+        const sec=document.createElement('div'); sec.className='section';
+        const title=document.createElement('div'); title.className='section-title'; title.textContent='Charge Point Status'; sec.appendChild(title);
+        const grid=document.createElement('div'); grid.className='status-grid';
+        Object.entries(statusCounts).forEach(([s,cnt])=>{ const box=document.createElement('div'); box.className='status-box'; box.appendChild(badge(s)); const num=document.createElement('div'); num.className='status-num'; num.textContent=cnt; box.appendChild(num); grid.appendChild(box); });
+        sec.appendChild(grid); el.appendChild(sec);
+      }
+
+      // Top locations chart
+      const locSess=sess.reduce((a,s)=>{ const id=s.locationId||s.location_id; if(id){a[id]=(a[id]||0)+1;} return a; },{});
+      const topLocs=Object.entries(locSess).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      if (topLocs.length) {
+        const max=topLocs[0][1];
+        const wrap=document.createElement('div'); wrap.className='prog-wrap';
+        const title=document.createElement('div'); title.className='section-title'; title.textContent='Top Locations — '+mLabel; wrap.appendChild(title);
+        topLocs.forEach(([id,cnt])=>{
+          const loc=locs.find(l=>String(l.id)===String(id));
+          const item=document.createElement('div'); item.className='prog-item';
+          const row=document.createElement('div'); row.className='prog-row';
+          const lbl=document.createElement('span'); lbl.textContent=loc?n(loc.name):'Location '+id;
+          const val=document.createElement('span'); val.style.color='#8892a4'; val.textContent=cnt+' sessions';
+          row.appendChild(lbl); row.appendChild(val);
+          const track=document.createElement('div'); track.className='prog-track';
+          const fill=document.createElement('div'); fill.className='prog-fill'; fill.style.width=Math.round(cnt/max*100)+'%';
+          track.appendChild(fill); item.appendChild(row); item.appendChild(track); wrap.appendChild(item);
+        });
+        el.appendChild(wrap);
+      }
+
+      // Locations grid
+      if (locs.length) {
+        const sec=document.createElement('div'); sec.className='section';
+        const title=document.createElement('div'); title.className='section-title'; title.textContent='Locations ('+locs.length.toLocaleString()+')'; sec.appendChild(title);
+        const grid=document.createElement('div'); grid.className='grid';
+        locs.slice(0,24).forEach(l=>{ const c=document.createElement('div'); c.className='loc-card'; c.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">📍 '+n(l.name)+'</div><div style="color:#8892a4;font-size:12px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div style="color:#4b5563;font-size:11px">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':''); grid.appendChild(c); });
+        sec.appendChild(grid); el.appendChild(sec);
+      }
       return;
     }
 
-    if (currentTab === 'chargepoints') {
-      var rows = filterArr(cp, ['id','serial_number','name']).map(function(c,i) {
-        return tr(i, [td(c.id,'mono'), td(n(c.name),'bold'), td(c.serial_number||'–','mono muted'), '<td>'+badgeHtml(c.connectivity_status||c.status)+'</td>', td(c.location_id||'–','muted'), td(c.model||c.vendor||'–','muted')]);
-      }).join('');
-      el.innerHTML = tableWrap(['ID','Name','Serial','Status','Location ID','Model'], rows, 6);
-      return;
+    if (currentTab==='chargepoints') {
+      const rows=filterArr(cp,['id','serial_number']).map(c=>makeRow([cell(c.id,'mono'),cell(n(c.name)),cell(c.serial_number||'–','mono muted'),badgeCell(c.connectivity_status||c.status),cell(c.location_id||'–','muted'),cell(c.model||c.vendor||'–','muted')]));
+      el.appendChild(makeTable(['ID','Name','Serial','Status','Location','Model'],rows)); return;
     }
 
-    if (currentTab === 'evses') {
-      var rows = filterArr(evses, ['id','network_id','status','charge_point_id']).map(function(e,i) {
-        return tr(i, [td(e.id,'muted'), td(e.network_id||e.evse_id||'–','mono'), '<td>'+badgeHtml(e.status)+'</td>', td(e.charge_point_id||e.chargePointId||'–','muted'), td(e.connector_type||(e.connectors&&e.connectors[0]&&e.connectors[0].type)||'–','muted'), td(e.max_power||'–','muted')]);
-      }).join('');
-      el.innerHTML = tableWrap(['ID','Network ID','Status','Charge Point','Connector','Max kW'], rows, 6);
-      return;
+    if (currentTab==='evses') {
+      const rows=filterArr(evses,['id','network_id','charge_point_id']).map(e=>makeRow([cell(e.id,'muted'),cell(e.network_id||e.evse_id||'–','mono'),badgeCell(e.status),cell(e.charge_point_id||e.chargePointId||'–','muted'),cell(e.connector_type||(e.connectors&&e.connectors[0]&&e.connectors[0].type)||'–','muted'),cell(e.max_power||'–','muted')]));
+      el.appendChild(makeTable(['ID','Network ID','Status','Charge Point','Connector','Max kW'],rows)); return;
     }
 
-    if (currentTab === 'sessions') {
-      var combined = active.concat(sess);
-      var seen = {};
-      var deduped = combined.filter(function(s){ if(seen[s.id]) return false; seen[s.id]=true; return true; });
-      var rows = filterArr(deduped, ['id','status','chargePointId','userId']).slice(0,500).map(function(s,i) {
-        var dur = (s.stoppedAt && s.startedAt) ? Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m' : '–';
-        return tr(i, [td(s.id,'mono'), '<td>'+badgeHtml(s.status)+'</td>', td(fmt(s.startedAt),'muted'), td((parseFloat(s.energy||0)/1000).toFixed(2),'bold'), td(dur,'muted'), td(s.chargePointId||'–','muted'), td(s.userId||'–','muted'), td(money(s.amount),'green')]);
-      }).join('');
-      el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+' + active sessions</div>' + tableWrap(['ID','Status','Started','kWh','Duration','Charge Point','User','Amount'], rows, 8);
-      return;
+    if (currentTab==='sessions') {
+      const combined=[...active,...sess], seen=new Set();
+      const deduped=combined.filter(s=>seen.has(s.id)?false:seen.add(s.id));
+      const note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px'; note.textContent='Showing '+mLabel+' + active sessions'; el.appendChild(note);
+      const rows=filterArr(deduped,['id','status','chargePointId','userId']).slice(0,500).map(s=>{
+        const dur=s.stoppedAt&&s.startedAt?Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m':'–';
+        return makeRow([cell(s.id,'mono'),badgeCell(s.status),cell(fmt(s.startedAt),'muted'),cell((parseFloat(s.energy||0)/1000).toFixed(2)),cell(dur,'muted'),cell(s.chargePointId||'–','muted'),cell(s.userId||'–','muted'),cell(money(s.amount),'green')]);
+      });
+      el.appendChild(makeTable(['ID','Status','Started','kWh','Duration','Charge Point','User','Amount'],rows)); return;
     }
 
-    if (currentTab === 'locations') {
-      el.innerHTML = '<div class="grid">' + filterArr(locs, ['city','country','post_code','region']).map(function(l) {
-        return '<div class="loc-card"><div class="loc-name">📍 '+n(l.name)+'</div><div class="loc-addr">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div class="loc-id">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div class="loc-cp">🔌 '+l.public_charge_points+' public CPs</div>':'')+'</div>';
-      }).join('') + '</div>';
-      return;
+    if (currentTab==='locations') {
+      const grid=document.createElement('div'); grid.className='grid';
+      filterArr(locs,['city','country','post_code','region']).forEach(l=>{ const c=document.createElement('div'); c.className='loc-card'; c.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px">📍 '+n(l.name)+'</div><div style="color:#8892a4;font-size:12px;margin-bottom:4px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div style="color:#4b5563;font-size:11px">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':''); grid.appendChild(c); });
+      el.appendChild(grid); return;
     }
 
-    if (currentTab === 'users') {
-      var rows = filterArr(usrs, ['id','email','first_name','last_name']).slice(0,500).map(function(u,i) {
-        var name = [u.first_name,u.last_name].filter(Boolean).join(' ') || n(u.name) || '–';
-        return tr(i, [td(u.id,'muted'), td(name,'bold'), td(u.email||'–','muted'), '<td>'+badgeHtml(u.status)+'</td>', td(money(u.balance),'green'), td(fmtDate(u.created_at||u.createdAt),'muted')]);
-      }).join('');
-      el.innerHTML = tableWrap(['ID','Name','Email','Status','Balance','Created'], rows, 6);
-      return;
+    if (currentTab==='users') {
+      const rows=filterArr(usrs,['id','email','first_name','last_name']).slice(0,500).map(u=>{
+        const nm=[u.first_name,u.last_name].filter(Boolean).join(' ')||n(u.name)||'–';
+        return makeRow([cell(u.id,'muted'),cell(nm),cell(u.email||'–','muted'),badgeCell(u.status),cell(money(u.balance),'green'),cell(fmtD(u.created_at||u.createdAt),'muted')]);
+      });
+      el.appendChild(makeTable(['ID','Name','Email','Status','Balance','Created'],rows)); return;
     }
 
-    if (currentTab === 'transactions') {
-      var rows = filterArr(txns, ['id','session_id','status']).slice(0,500).map(function(t,i) {
-        var amt = t.totalAmount || t.amount || 0;
-        return tr(i, [td(t.id,'mono'), td(t.sessionId||t.session_id||'–','mono muted'), td(money(amt),'green'), td(t.currency||'USD','muted'), '<td>'+badgeHtml(t.status)+'</td>', td(fmt(t.date||t.created_at),'muted')]);
-      }).join('');
-      el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+'</div>' + tableWrap(['ID','Session','Amount','Currency','Status','Created'], rows, 6);
-      return;
-    }
-  } catch(e) {
-    el.innerHTML = '<div class="error">⚠️ Render error in "'+currentTab+'": '+e.message+'<br><pre style="font-size:11px;margin-top:8px">'+e.stack+'</pre></div>';
-    console.error(e);
-  }
-}
-
-// ── HTML helpers ──────────────────────────────────────────────────
-function card(icon, label, value, color, sub) {
-  return '<div class="card"><div class="card-icon">'+icon+'</div><div class="card-label">'+label+'</div><div class="card-value" style="color:'+color+'">'+value+'</div>'+(sub?'<div class="card-sub">'+sub+'</div>':'')+'</div>';
-}
-function td(val, cls) { return '<td'+(cls?' class="'+cls+'"':'')+'>'+val+'</td>'; }
-function tr(i, cells) { return '<tr>'+cells.join('')+'</tr>'; }
-function tableWrap(headers, rows, cols) {
-  var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
-  var empty = rows ? '' : '<tr><td colspan="'+cols+'" class="empty">No data</td></tr>';
-  return '<div class="table-wrap"><table><thead><tr>'+ths+'</tr></thead><tbody>'+(rows||empty)+'</tbody></table></div>';
-}
-function activeSessTable(active) {
-  var rows = active.map(function(s,i){
-    return tr(i, [td(s.id,'mono'), td(s.chargePointId||'–','muted'), td(s.userId||'–','muted'), td(fmt(s.startedAt),'muted'), td((parseFloat(s.energy||0)/1000).toFixed(2),'bold')]);
-  }).join('');
-  return '<div class="section"><div class="section-title">⚡ Live Active Sessions ('+active.length+')</div>'+tableWrap(['Session ID','Charge Point','User','Started','kWh'], rows, 5)+'</div>';
-}
-function statusSection(counts) {
-  var boxes = Object.entries(counts).map(function(e){ return '<div class="status-box">'+badgeHtml(e[0])+'<div class="status-num">'+e[1]+'</div></div>'; }).join('');
-  return '<div class="section"><div class="section-title">Charge Point Status</div><div class="status-grid">'+boxes+'</div></div>';
-}
-function topLocsChart(topLocs, locs, maxSess, monthLabel) {
-  var bars = topLocs.map(function(entry){
-    var loc = locs.filter(function(l){ return String(l.id)===String(entry[0]); })[0];
-    var label = loc ? n(loc.name) : 'Location '+entry[0];
-    var pct = Math.round(entry[1]/maxSess*100);
-    return '<div class="progress-item"><div class="progress-label"><span>'+label+'</span><span style="color:#8892a4">'+entry[1]+' sessions</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%;background:#00c2a8"></div></div></div>';
-  }).join('');
-  return '<div class="progress-bar"><div class="progress-title">Top Locations by Sessions — '+monthLabel+'</div>'+bars+'</div>';
-}
-function locsGrid(locs) {
-  var cards = locs.map(function(l){
-    return '<div class="loc-card"><div class="loc-name">📍 '+n(l.name)+'</div><div class="loc-addr">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div class="loc-id">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div class="loc-cp">🔌 '+l.public_charge_points+' public CPs</div>':'')+'</div>';
-  }).join('');
-  return '<div class="section"><div class="section-title">Locations ('+locs.length+')</div><div class="grid">'+cards+'</div></div>';
-}
-
-// ── Init ──────────────────────────────────────────────────────────
-buildMonthOptions();
-</script>
-</body>
-</html>
-+totalRev.toFixed(2), '#10b981') +
-          card('👤','Total Users', usrs.length.toLocaleString(), '#f97316') +
-        '</div>' +
-        (active.length ? activeSessTable(active) : '') +
-        (Object.keys(statusCounts).length ? statusSection(statusCounts) : '') +
-        (topLocs.length ? topLocsChart(topLocs, locs, maxSess, monthLabel) : '') +
-        (locs.length ? locsGrid(locs.slice(0,24)) : '');
-      return;
-    }
-
-    if (currentTab === 'chargepoints') {
-      var rows = filterArr(cp, ['id','serial_number','name']).map(function(c,i) {
-        return tr(i, [td(c.id,'mono'), td(n(c.name),'bold'), td(c.serial_number||'–','mono muted'), '<td>'+badgeHtml(c.connectivity_status||c.status)+'</td>', td(c.location_id||'–','muted'), td(c.model||c.vendor||'–','muted')]);
-      }).join('');
-      el.innerHTML = tableWrap(['ID','Name','Serial','Status','Location ID','Model'], rows, 6);
-      return;
-    }
-
-    if (currentTab === 'evses') {
-      var rows = filterArr(evses, ['id','network_id','status','charge_point_id']).map(function(e,i) {
-        return tr(i, [td(e.id,'muted'), td(e.network_id||e.evse_id||'–','mono'), '<td>'+badgeHtml(e.status)+'</td>', td(e.charge_point_id||e.chargePointId||'–','muted'), td(e.connector_type||(e.connectors&&e.connectors[0]&&e.connectors[0].type)||'–','muted'), td(e.max_power||'–','muted')]);
-      }).join('');
-      el.innerHTML = tableWrap(['ID','Network ID','Status','Charge Point','Connector','Max kW'], rows, 6);
-      return;
-    }
-
-    if (currentTab === 'sessions') {
-      var combined = active.concat(sess);
-      var seen = {};
-      var deduped = combined.filter(function(s){ if(seen[s.id]) return false; seen[s.id]=true; return true; });
-      var rows = filterArr(deduped, ['id','status','chargePointId','userId']).slice(0,500).map(function(s,i) {
-        var dur = (s.stoppedAt && s.startedAt) ? Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m' : '–';
-        return tr(i, [td(s.id,'mono'), '<td>'+badgeHtml(s.status)+'</td>', td(fmt(s.startedAt),'muted'), td((parseFloat(s.energy||0)/1000).toFixed(2),'bold'), td(dur,'muted'), td(s.chargePointId||'–','muted'), td(s.userId||'–','muted'), td(money(s.amount),'green')]);
-      }).join('');
-      el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+' + active sessions</div>' + tableWrap(['ID','Status','Started','kWh','Duration','Charge Point','User','Amount'], rows, 8);
-      return;
-    }
-
-    if (currentTab === 'locations') {
-      el.innerHTML = '<div class="grid">' + filterArr(locs, ['city','country','post_code','region']).map(function(l) {
-        return '<div class="loc-card"><div class="loc-name">📍 '+n(l.name)+'</div><div class="loc-addr">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div class="loc-id">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div class="loc-cp">🔌 '+l.public_charge_points+' public CPs</div>':'')+'</div>';
-      }).join('') + '</div>';
-      return;
-    }
-
-    if (currentTab === 'users') {
-      var rows = filterArr(usrs, ['id','email','first_name','last_name']).slice(0,500).map(function(u,i) {
-        var name = [u.first_name,u.last_name].filter(Boolean).join(' ') || n(u.name) || '–';
-        return tr(i, [td(u.id,'muted'), td(name,'bold'), td(u.email||'–','muted'), '<td>'+badgeHtml(u.status)+'</td>', td(money(u.balance),'green'), td(fmtDate(u.created_at||u.createdAt),'muted')]);
-      }).join('');
-      el.innerHTML = tableWrap(['ID','Name','Email','Status','Balance','Created'], rows, 6);
-      return;
-    }
-
-    if (currentTab === 'transactions') {
-      var rows = filterArr(txns, ['id','session_id','status']).slice(0,500).map(function(t,i) {
-        var amt = t.totalAmount || t.amount || 0;
-        return tr(i, [td(t.id,'mono'), td(t.sessionId||t.session_id||'–','mono muted'), td(money(amt),'green'), td(t.currency||'USD','muted'), '<td>'+badgeHtml(t.status)+'</td>', td(fmt(t.date||t.created_at),'muted')]);
-      }).join('');
-      el.innerHTML = '<div style="color:#8892a4;font-size:12px;margin-bottom:10px">Showing '+monthLabel+'</div>' + tableWrap(['ID','Session','Amount','Currency','Status','Created'], rows, 6);
-      return;
+    if (currentTab==='transactions') {
+      const note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px'; note.textContent='Showing '+mLabel; el.appendChild(note);
+      const rows=filterArr(txns,['id','sessionId','status']).slice(0,500).map(t=>makeRow([cell(t.id,'mono'),cell(t.sessionId||t.session_id||'–','mono muted'),cell(money(t.totalAmount||t.amount),'green'),cell(t.currency||'USD','muted'),badgeCell(t.status),cell(fmt(t.date||t.created_at),'muted')]));
+      el.appendChild(makeTable(['ID','Session','Amount','Currency','Status','Date'],rows));
     }
   } catch(e) {
-    el.innerHTML = '<div class="error">⚠️ Render error in "'+currentTab+'": '+e.message+'<br><pre style="font-size:11px;margin-top:8px">'+e.stack+'</pre></div>';
+    const div=document.createElement('div'); div.className='err'; div.textContent='⚠️ Render error in "'+currentTab+'": '+e.message+'\n'+e.stack; el.appendChild(div);
     console.error(e);
   }
-}
-
-// ── HTML helpers ──────────────────────────────────────────────────
-function card(icon, label, value, color, sub) {
-  return '<div class="card"><div class="card-icon">'+icon+'</div><div class="card-label">'+label+'</div><div class="card-value" style="color:'+color+'">'+value+'</div>'+(sub?'<div class="card-sub">'+sub+'</div>':'')+'</div>';
-}
-function td(val, cls) { return '<td'+(cls?' class="'+cls+'"':'')+'>'+val+'</td>'; }
-function tr(i, cells) { return '<tr>'+cells.join('')+'</tr>'; }
-function tableWrap(headers, rows, cols) {
-  var ths = headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
-  var empty = rows ? '' : '<tr><td colspan="'+cols+'" class="empty">No data</td></tr>';
-  return '<div class="table-wrap"><table><thead><tr>'+ths+'</tr></thead><tbody>'+(rows||empty)+'</tbody></table></div>';
-}
-function activeSessTable(active) {
-  var rows = active.map(function(s,i){
-    return tr(i, [td(s.id,'mono'), td(s.chargePointId||'–','muted'), td(s.userId||'–','muted'), td(fmt(s.startedAt),'muted'), td((parseFloat(s.energy||0)/1000).toFixed(2),'bold')]);
-  }).join('');
-  return '<div class="section"><div class="section-title">⚡ Live Active Sessions ('+active.length+')</div>'+tableWrap(['Session ID','Charge Point','User','Started','kWh'], rows, 5)+'</div>';
-}
-function statusSection(counts) {
-  var boxes = Object.entries(counts).map(function(e){ return '<div class="status-box">'+badgeHtml(e[0])+'<div class="status-num">'+e[1]+'</div></div>'; }).join('');
-  return '<div class="section"><div class="section-title">Charge Point Status</div><div class="status-grid">'+boxes+'</div></div>';
-}
-function topLocsChart(topLocs, locs, maxSess, monthLabel) {
-  var bars = topLocs.map(function(entry){
-    var loc = locs.filter(function(l){ return String(l.id)===String(entry[0]); })[0];
-    var label = loc ? n(loc.name) : 'Location '+entry[0];
-    var pct = Math.round(entry[1]/maxSess*100);
-    return '<div class="progress-item"><div class="progress-label"><span>'+label+'</span><span style="color:#8892a4">'+entry[1]+' sessions</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%;background:#00c2a8"></div></div></div>';
-  }).join('');
-  return '<div class="progress-bar"><div class="progress-title">Top Locations by Sessions — '+monthLabel+'</div>'+bars+'</div>';
-}
-function locsGrid(locs) {
-  var cards = locs.map(function(l){
-    return '<div class="loc-card"><div class="loc-name">📍 '+n(l.name)+'</div><div class="loc-addr">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div><div class="loc-id">'+(l.external_id||'ID: '+l.id)+'</div>'+(l.public_charge_points!=null?'<div class="loc-cp">🔌 '+l.public_charge_points+' public CPs</div>':'')+'</div>';
-  }).join('');
-  return '<div class="section"><div class="section-title">Locations ('+locs.length+')</div><div class="grid">'+cards+'</div></div>';
 }
 
 // ── Init ──────────────────────────────────────────────────────────
