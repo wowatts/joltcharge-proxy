@@ -156,12 +156,14 @@ function saveCache(ym, data, lastFetch) {
     var str = JSON.stringify(payload);
     localStorage.setItem(cKey(ym), str);
     var verify = localStorage.getItem(cKey(ym));
+    var kb = Math.round(str.length/1024);
     if (verify) {
-      var kb = Math.round(str.length/1024);
+      alert('✅ Cache saved! Key: '+cKey(ym)+' Size: '+kb+'KB\nSwitch months now to test.');
       addLog('💾 Saved '+ym+' ('+kb+'KB)', 'lok');
       $('cacheTxt').textContent = '💾 '+kb+'KB cached';
     } else {
-      addLog('❌ Cache write failed (readback null)', 'lerr');
+      alert('❌ localStorage.setItem ran but getItem returned null');
+      addLog('❌ Cache write failed', 'lerr');
     }
     updateMonthLabels();
   } catch(e) {
@@ -185,13 +187,16 @@ function clearCache(ym) {
 function cacheToData(c, ym) {
   return {
     _month:ym,
-    locations:    c.locations    || [],
-    chargePoints: c.chargePoints || [],
-    evses:        c.evses        || [],
-    users:        c.users        || [],
+    // Static data not cached — will be fetched fresh
+    locations:    [],
+    chargePoints: [],
+    evses:        [],
+    users:        [],
+    // Sessions/transactions restored from tiny sample
     sessions:     c.sessSample   || [],
     transactions: c.txnSample    || [],
     activeSessions: [],
+    // Pre-computed totals for overview cards
     _sessCount:   c.sessCount    || 0,
     _txnCount:    c.txnCount     || 0,
     _totalEnergy: c.totalEnergy  || 0,
@@ -638,6 +643,25 @@ function renderTab() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────
+// Test localStorage immediately on page load
+(function() {
+  try {
+    var testKey = 'ampeco_cache_test';
+    var testVal = 'working_' + Date.now();
+    localStorage.setItem(testKey, testVal);
+    var readback = localStorage.getItem(testKey);
+    localStorage.removeItem(testKey);
+    if (readback === testVal) {
+      console.log('[Cache Test] ✅ localStorage works fine');
+    } else {
+      console.error('[Cache Test] ❌ Write succeeded but readback was:', readback);
+      alert('localStorage test FAILED: wrote "'+testVal+'" but got back "'+readback+'"');
+    }
+  } catch(e) {
+    console.error('[Cache Test] ❌ Exception:', e);
+    alert('localStorage EXCEPTION: '+e.name+': '+e.message);
+  }
+})();
 buildMonthOptions();
 </script>
 </body>
