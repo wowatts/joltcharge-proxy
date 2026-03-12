@@ -70,7 +70,7 @@ td{padding:8px 13px;border-top:1px solid #2d3748}
   </div>
   <div class="header-right">
     <select class="sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn-ghost" id="clearBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
+    <button class="btn-ghost" onclick="diagCache()" style="font-size:12px">🔍 Cache Diag</button>
     <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Data</button>
     <span class="badge" id="badge" style="display:none">🟢 <span id="badgeTxt"></span></span>
     <span style="color:#4b5563;font-size:11px" id="cacheTxt"></span>
@@ -603,6 +603,44 @@ function renderTab() {
     const div=document.createElement('div'); div.className='err'; div.textContent='⚠️ Render error in "'+currentTab+'": '+e.message+'\n'+e.stack; el.appendChild(div);
     console.error(e);
   }
+}
+
+// ── Cache diagnostics ─────────────────────────────────────────────
+function diagCache() {
+  const out = [];
+  try {
+    // 1. Can we write?
+    localStorage.setItem('diag_test', 'hello');
+    const rb = localStorage.getItem('diag_test');
+    localStorage.removeItem('diag_test');
+    out.push('Write/read: ' + (rb === 'hello' ? '✅ OK' : '❌ FAILED'));
+
+    // 2. What keys exist?
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
+    out.push('All keys (' + keys.length + '): ' + (keys.length ? keys.join(', ') : '(none)'));
+
+    // 3. Try writing a real cache entry
+    const testKey = 'ampeco_v2_diag';
+    const testVal = JSON.stringify({ test: true, ts: Date.now() });
+    localStorage.setItem(testKey, testVal);
+    const rb2 = localStorage.getItem(testKey);
+    localStorage.removeItem(testKey);
+    out.push('Test cache entry: ' + (rb2 === testVal ? '✅ OK' : '❌ FAILED'));
+
+    // 4. Check current month key
+    const ym = getYM();
+    const existing = localStorage.getItem(cKey(ym));
+    out.push('Cache key "' + cKey(ym) + '": ' + (existing ? '✅ exists (' + Math.round(existing.length/1024) + 'KB)' : '❌ not found'));
+
+    // 5. List all ampeco keys
+    const aKeys = keys.filter(k => k.startsWith('ampeco'));
+    out.push('Ampeco keys: ' + (aKeys.length ? aKeys.join(', ') : '(none)'));
+
+  } catch(e) {
+    out.push('❌ Exception: ' + e.name + ': ' + e.message);
+  }
+  alert(out.join('\n'));
 }
 
 // ── Init ──────────────────────────────────────────────────────────
