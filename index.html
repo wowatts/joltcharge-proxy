@@ -169,9 +169,14 @@ function saveCache(ym, data, lastFetch) {
 
 function loadCache(ym) {
   try {
-    const raw = localStorage.getItem(cKey(ym));
+    const key = cKey(ym);
+    const raw = localStorage.getItem(key);
+    console.log('[Cache] loadCache('+ym+') key='+key+' found='+(raw?'yes ('+Math.round(raw.length/1024)+'KB)':'NO'));
     return raw ? JSON.parse(raw) : null;
-  } catch(e) { return null; }
+  } catch(e) {
+    console.error('[Cache] loadCache error:', e);
+    return null;
+  }
 }
 
 function clearCache(ym) {
@@ -251,7 +256,9 @@ function clearCurrentCache() { clearCache(getYM()); loadAll(); }
 function onMonthChange() {
   updateMonthLabels();
   const ym = getYM();
+  console.log('[onMonthChange] ym='+ym);
   const c = loadCache(ym);
+  console.log('[onMonthChange] cache=', c ? 'HIT (savedAt='+c.savedAt+')' : 'MISS');
   if (c) {
     log('📦 Loaded '+ym+' from cache instantly', 'lok');
     allData = cacheToAllData(c, ym);
