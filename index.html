@@ -79,6 +79,7 @@
     <button class="btn-ghost" id="clearCacheBtn" onclick="clearCurrentCache()" style="display:none;font-size:12px">🗑️ Clear Cache</button>
     <button class="btn" id="loadBtn" onclick="loadAll()">🔌 Load Data</button>
     <span class="badge" id="statusBadge" style="display:none">🟢 <span id="recordCount"></span></span>
+    <span style="color:#4b5563;font-size:11px;margin-left:4px" id="cacheStatus"></span>
   </div>
 </div>
 
@@ -149,16 +150,26 @@ function saveToCache(ym, data, lastFetchedAt) {
   try {
     var payload = JSON.stringify({ v: 1, savedAt: new Date().toISOString(), lastFetchedAt: lastFetchedAt, data: data });
     localStorage.setItem(cacheKey(ym), payload);
-    log('💾 Saved ' + ym + ' to localStorage (persists across deployments)', 'log-ok');
-  } catch(e) { log('⚠️ Cache write failed: ' + e.message); }
+    var readback = localStorage.getItem(cacheKey(ym));
+    var ok = !!readback;
+    log('💾 Cache save ' + ym + ': ' + (ok ? '✅ verified (' + Math.round(payload.length/1024) + 'KB)' : '❌ readback failed'), ok ? 'log-ok' : 'log-err');
+    document.getElementById('cacheStatus').textContent = '💾 Cached: ' + ym;
+  } catch(e) {
+    log('⚠️ Cache write failed: ' + e.message + (e.name === 'QuotaExceededError' ? ' (storage full!)' : ''), 'log-err');
+  }
 }
 
 function loadFromCache(ym) {
   try {
     var raw = localStorage.getItem(cacheKey(ym));
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch(e) { return null; }
+    if (!raw) { console.log('[Cache] No entry for', ym); return null; }
+    var parsed = JSON.parse(raw);
+    console.log('[Cache] Loaded', ym, '| savedAt:', parsed.savedAt, '| sessions:', (parsed.data && parsed.data.sessions) ? parsed.data.sessions.length : 0);
+    return parsed;
+  } catch(e) {
+    console.error('[Cache] Load error for', ym, e);
+    return null;
+  }
 }
 
 function clearCache(ym) {
@@ -210,6 +221,25 @@ function buildMonthOptions() {
     sel.appendChild(opt);
   }
   updateMonthLabels();
+
+  // Cache diagnostic
+  try {
+    localStorage.setItem('ampeco_test', '1');
+    var ok = localStorage.getItem('ampeco_test') === '1';
+    localStorage.removeItem('ampeco_test');
+    var keys = [];
+    for (var j = 0; j < localStorage.length; j++) {
+      var k = localStorage.key(j);
+      if (k && k.startsWith('ampeco_month_')) keys.push(k);
+    }
+    console.log('[Ampeco Cache] localStorage available:', ok, '| cached months:', keys);
+    document.getElementById('cacheStatus').textContent = ok
+      ? '💾 Cache: ' + (keys.length ? keys.map(function(k){ return k.replace('ampeco_month_',''); }).join(', ') : 'empty')
+      : '⚠️ localStorage unavailable';
+  } catch(e) {
+    document.getElementById('cacheStatus').textContent = '⚠️ localStorage error: ' + e.message;
+    console.error('[Ampeco Cache] localStorage error:', e);
+  }
 }
 
 function updateMonthLabels() {
