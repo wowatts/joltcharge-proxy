@@ -643,25 +643,6 @@ function renderTab() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────
-// Test localStorage immediately on page load
-(function() {
-  try {
-    var testKey = 'ampeco_cache_test';
-    var testVal = 'working_' + Date.now();
-    localStorage.setItem(testKey, testVal);
-    var readback = localStorage.getItem(testKey);
-    localStorage.removeItem(testKey);
-    if (readback === testVal) {
-      console.log('[Cache Test] ✅ localStorage works fine');
-    } else {
-      console.error('[Cache Test] ❌ Write succeeded but readback was:', readback);
-      alert('localStorage test FAILED: wrote "'+testVal+'" but got back "'+readback+'"');
-    }
-  } catch(e) {
-    console.error('[Cache Test] ❌ Exception:', e);
-    alert('localStorage EXCEPTION: '+e.name+': '+e.message);
-  }
-})();
 buildMonthOptions();
 </script>
 </body>
