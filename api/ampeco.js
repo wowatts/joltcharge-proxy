@@ -21,20 +21,20 @@ module.exports = async function handler(req, res) {
   // Stop when all items on a page are before dateFrom.
   if (dateFrom && cpIds) {
     try {
-      const from     = new Date(dateFrom + 'T00:00:00Z');
-      const to       = dateTo ? new Date(dateTo + 'T23:59:59Z') : new Date();
-      const cpIdSet  = new Set(String(cpIds).split(',').map(id => Number(id)));
+      const from    = new Date(dateFrom + 'T00:00:00Z');
+      const to      = dateTo ? new Date(dateTo + 'T23:59:59Z') : new Date();
+      const cpIdSet = new Set(String(cpIds).split(',').map(id => Number(id)));
 
-      // Get last page number
-      const sep = decoded.includes("?") ? "&" : "?";
-      const firstRes = await fetch(`${BASE}${decoded}${sep}per_page=100&page=1`, { headers });
+      // Sessions API — use /resources/sessions/v1.0 with no filters
+      // It returns all sessions globally, oldest→newest
+      // We fetch the last N pages (newest sessions) and filter client-side
+      const sessionPath = '/resources/sessions/v1.0';
+      const firstRes = await fetch(`${BASE}${sessionPath}?per_page=100&page=1`, { headers });
       if (!firstRes.ok) return res.status(firstRes.status).json(await firstRes.json().catch(()=>{}));
       const firstJson = await firstRes.json();
       const lastPage = firstJson.meta?.last_page || 1;
 
-      // Fetch last N pages in parallel — how many depends on network size
-      // Each page = 100 sessions across ALL chargers. A busy network needs more pages
-      // to find a small partner's sessions. Fetch 10 pages = 1000 recent sessions.
+      // Fetch last 10 pages in parallel (~1000 most recent sessions across network)
       const numPages = Math.min(10, lastPage);
       const pageNums = [];
       for (let i = 0; i < numPages; i++) {
@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
 
       const results = await Promise.all(
         pageNums.map(p =>
-          fetch(`${BASE}${decoded}${sep}per_page=100&page=${p}`, { headers })
+          fetch(`${BASE}${sessionPath}?per_page=100&page=${p}`, { headers })
             .then(r => r.ok ? r.json() : { data: [] })
             .catch(() => ({ data: [] }))
         )
@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
       const matched = [];
       for (const r of results) {
         for (const item of (r.data || [])) {
-          const d = new Date(item.startedAt || item.date || 0);
+          const d    = new Date(item.startedAt || item.date || 0);
           const cpId = item.chargePointId || item.charge_point_id;
           if (d >= from && d <= to && cpIdSet.has(Number(cpId))) {
             matched.push(item);
