@@ -186,12 +186,11 @@ function buildMonthOptions(){
 
 // ── API helpers ────────────────────────────────────────────────
 async function apiFetch(path){
-  // Pass path as ?path= and let the proxy append it cleanly
   var url = PROXY + '?path=' + encodeURIComponent(path);
   var res = await fetch(url);
   if (!res.ok){
     var b = await res.text();
-    throw new Error('HTTP '+res.status+' — '+path.split('?')[0]+': '+b.slice(0,120));
+    throw new Error('HTTP ' + res.status + ' — ' + path.split('?')[0] + ': ' + b.slice(0, 120));
   }
   return res.json();
 }
