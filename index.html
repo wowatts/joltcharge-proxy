@@ -217,37 +217,63 @@ async function loadPartnerData(){
     var chargePoints = await getPages('/resources/charge-points/v1.0?filter[partnerId]='+pid, 50);
 
     // Get charge point IDs for filtering sessions
-    var cpIds = chargePoints.map(function(cp){return cp.id;});
+    var cpIds = chargePoints.map(function(cp){ return cp.id; });
 
-    // Fetch sessions for this month filtered by partner charge points
-    // Ampeco supports filter[chargePointId][] for session filtering
     var sessions = [];
     var transactions = [];
 
     if(cpIds.length > 0){
+      // Fetch sessions filtered by chargePointIds (batch in groups of 20 to avoid URL length limits)
       $('loadMsg').textContent = 'Loading sessions...';
-      // Filter sessions by this month and partner's charge points
-      sessions = await getPages(
-        '/resources/sessions/v1.0?filter[startedAt][from]='+range.from+'&filter[startedAt][to]='+range.to+'&filter[partnerId]='+pid,
-        100
-      );
+      var sessionMap = {};
+      var batchSize = 20;
+      for(var b = 0; b < cpIds.length; b += batchSize){
+        var batch = cpIds.slice(b, b + batchSize);
+        var cpFilter = batch.map(function(id){ return 'filter[chargePointId][]='+id; }).join('&');
+        var batchSess = await getPages(
+          '/resources/sessions/v1.0?filter[startedAt][from]='+range.from+'&filter[startedAt][to]='+range.to+'&'+cpFilter,
+          50
+        );
+        batchSess.forEach(function(s){ sessionMap[s.id] = s; });
+      }
+      sessions = Object.values(sessionMap);
 
+      // Fetch transactions by sessionIds (match to sessions we already have)
+      // Transactions don't support partnerId filter — we filter client-side by sessionId
       $('loadMsg').textContent = 'Loading transactions...';
-      transactions = await getPages(
-        '/resources/transactions/v1.0?filter[date][from]='+range.from+'&filter[date][to]='+range.to+'&filter[partnerId]='+pid,
+      var allTxns = await getPages(
+        '/resources/transactions/v1.0?filter[date][from]='+range.from+'&filter[date][to]='+range.to,
         100
       );
+      // Keep only transactions whose sessionId matches a session belonging to this partner
+      var sessIdSet = {};
+      sessions.forEach(function(s){ sessIdSet[String(s.id)] = true; });
+      transactions = allTxns.filter(function(t){
+        return sessIdSet[String(t.sessionId)] || sessIdSet[String(t.session_id)];
+      });
     }
 
-    // Fetch active sessions for this partner
+    // Active sessions — fetch recent sessions for this partner's charge points, filter client-side
     $('loadMsg').textContent = 'Checking active sessions...';
     var last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
-    var recentSess = await getPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&filter[partnerId]='+pid, 5);
-    var activeSessions = recentSess.filter(function(s){return s.status==='active'||s.status==='pending';});
+    var activeSessions = [];
+    if(cpIds.length > 0){
+      var recentMap = {};
+      for(var b = 0; b < Math.min(cpIds.length, 20); b += 20){
+        var batch = cpIds.slice(b, b+20);
+        var cpFilter = batch.map(function(id){ return 'filter[chargePointId][]='+id; }).join('&');
+        var recent = await getPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24+'&'+cpFilter, 5);
+        recent.forEach(function(s){ recentMap[s.id]=s; });
+      }
+      activeSessions = Object.values(recentMap).filter(function(s){ return s.status==='active'||s.status==='pending'; });
+    }
 
-    // Fetch locations for this partner
+    // Locations — fetch all and filter client-side by partner's charge point location IDs
     $('loadMsg').textContent = 'Loading locations...';
-    var locations = await getPages('/resources/locations/v1.0?filter[partnerId]='+pid, 50);
+    var cpLocationIds = {};
+    chargePoints.forEach(function(cp){ if(cp.location_id) cpLocationIds[cp.location_id]=true; });
+    var allLocations = await getPages('/resources/locations/v1.0', 100);
+    var locations = allLocations.filter(function(l){ return cpLocationIds[l.id]; });
 
     partnerData = {
       partner: partner,
