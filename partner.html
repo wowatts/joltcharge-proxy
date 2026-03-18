@@ -186,25 +186,31 @@ function buildMonthOptions(){
 
 // ── API helpers ────────────────────────────────────────────────
 async function apiFetch(path){
-  var res=await fetch(PROXY+'?path='+encodeURIComponent(path));
-  if(!res.ok){
-    var b=await res.text();
+  // Pass path as ?path= and let the proxy append it cleanly
+  var url = PROXY + '?path=' + encodeURIComponent(path);
+  var res = await fetch(url);
+  if (!res.ok){
+    var b = await res.text();
     throw new Error('HTTP '+res.status+' — '+path.split('?')[0]+': '+b.slice(0,120));
   }
   return res.json();
 }
 
 async function getPages(path, max){
-  max=max||50;
-  var all=[],page=1,last=1;
+  max = max || 50;
+  var all = [], page = 1, last = 1;
   do {
-    var sep=path.indexOf('?')>=0?'&':'?';
-    var j=await apiFetch(path+sep+'per_page=100&page='+page);
-    var items=j.data||j.items||(Array.isArray(j)?j:[]);
-    all=all.concat(items);
-    last=(j.meta&&j.meta.last_page)?j.meta.last_page:1;
+    // Pass per_page and page as separate query params to the proxy
+    // so they don't get mixed into the path's filter params
+    var url = PROXY + '?path=' + encodeURIComponent(path) + '&per_page=100&page=' + page;
+    var res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + path.split('?')[0]);
+    var j = await res.json();
+    var items = j.data || j.items || (Array.isArray(j) ? j : []);
+    all = all.concat(items);
+    last = (j.meta && j.meta.last_page) ? j.meta.last_page : 1;
     page++;
-  } while(page<=last&&page<=max);
+  } while (page <= last && page <= max);
   return all;
 }
 
