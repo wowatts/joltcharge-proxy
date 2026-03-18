@@ -285,7 +285,7 @@ async function loadData(preloadedCPs){
     activeSessions.forEach(function(s){sessIdSet[String(s.id)]=true;});
 
     var allTxns=await getPages(
-      '/resources/transactions/v1.0?filter[date][from]='+range.from+'&filter[date][to]='+range.to,
+      '/resources/transactions/v1.0?dateFrom='+range.from+'&dateTo='+range.to,
       100
     );
     var transactions=allTxns.filter(function(t){
