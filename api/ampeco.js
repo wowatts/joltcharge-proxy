@@ -16,12 +16,11 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "Missing env var: AMPECO_API_KEY" });
   }
 
-  // Build the upstream URL:
-  // - `path` contains the API path and any filters already encoded in it
-  // - `rest` contains additional query params (per_page, page) passed separately
+  // Decode the path so brackets in filter params are preserved correctly
+  const decodedPath = decodeURIComponent(path);
   const extraParams = new URLSearchParams(rest).toString();
-  const separator = path.includes("?") ? "&" : "?";
-  const url = `${AMPECO_BASE}${path}${extraParams ? separator + extraParams : ""}`;
+  const separator = decodedPath.includes("?") ? "&" : "?";
+  const url = `${AMPECO_BASE}${decodedPath}${extraParams ? separator + extraParams : ""}`;
 
   try {
     const upstream = await fetch(url, {
