@@ -216,6 +216,437 @@ async function loadPartnerData(){
     // Fetch charge points for this partner
     var chargePoints = await getPages('/resources/charge-points/v1.0?filter[partnerId]='+pid, 50);
 
+    var sessions = [];
+    var transactions = [];
+
+    if(cpIds.length > 0){
+      // Fetch ALL sessions for the month, filter client-side by this partner's charge point IDs
+      $('loadMsg').textContent = 'Loading sessions...';
+      var cpIdSet = {};
+      cpIds.forEach(function(id){ cpIdSet[String(id)] = true; });
+
+      var allSessions = await getPages(
+        '/resources/sessions/v1.0?filter[startedAt][from]='+range.from+'&filter[startedAt][to]='+range.to,
+        100
+      );
+      sessions = allSessions.filter(function(s){
+        return cpIdSet[String(s.chargePointId)] || cpIdSet[String(s.charge_point_id)];
+      });
+
+      // Fetch ALL transactions for the month, filter client-side by sessionId
+      $('loadMsg').textContent = 'Loading transactions...';
+      var sessIdSet = {};
+      sessions.forEach(function(s){ sessIdSet[String(s.id)] = true; });
+
+      var allTxns = await getPages(
+        '/resources/transactions/v1.0?filter[date][from]='+range.from+'&filter[date][to]='+range.to,
+        100
+      );
+      transactions = allTxns.filter(function(t){
+        return sessIdSet[String(t.sessionId)] || sessIdSet[String(t.session_id)];
+      });
+    }
+
+    // Active sessions — fetch last 24h, filter client-side by this partner's charge point IDs
+    $('loadMsg').textContent = 'Checking active sessions...';
+    var last24 = new Date(Date.now()-24*3600000).toISOString().slice(0,10);
+    var activeSessions = [];
+    if(cpIds.length > 0){
+      var recent = await getPages('/resources/sessions/v1.0?filter[startedAt][from]='+last24, 5);
+      activeSessions = recent.filter(function(s){
+        return (s.status==='active'||s.status==='pending') &&
+               (cpIdSet[String(s.chargePointId)] || cpIdSet[String(s.charge_point_id)]);
+      });
+    }
+
+    // Locations — fetch all and filter client-side by partner's charge point location IDs
+    $('loadMsg').textContent = 'Loading locations...';
+    var cpLocationIds = {};
+    chargePoints.forEach(function(cp){ if(cp.location_id) cpLocationIds[cp.location_id]=true; });
+    var allLocations = await getPages('/resources/locations/v1.0', 100);
+    var locations = allLocations.filter(function(l){ return cpLocationIds[l.id]; });
+
+    partnerData = {
+      partner: partner,
+      chargePoints: chargePoints,
+      sessions: sessions,
+      transactions: transactions,
+      activeSessions: activeSessions,
+      locations: locations,
+      month: ym
+    };
+
+    $('loadEl').style.display = 'none';
+    $('dashEl').style.display = 'block';
+    $('refreshBtn').style.display = '';
+    $('badge').style.display = '';
+    buildTabs();
+    switchTab('overview');
+
+  } catch(e){
+    showErr('Error loading partner data: '+e.message);
+  }
+}
+
+// ── Tabs ───────────────────────────────────────────────────────
+var TABS = [
+  {key:'overview',    label:'Overview'},
+  {key:'chargers',    label:'Chargers',     dk:'chargePoints'},
+  {key:'sessions',    label:'Sessions',     dk:'sessions'},
+  {key:'transactions',label:'Transactions', dk:'transactions'},
+  {key:'locations',   label:'Locations',    dk:'locations'},
+];
+
+function buildTabs(){
+  var el=$('tabsEl'); el.innerHTML='';
+  TABS.forEach(function(t){
+    var btn=document.createElement('button');
+    btn.className='tab'+(t.key===currentTab?' active':'');
+    btn.onclick=function(){switchTab(t.key);};
+    btn.textContent=t.label;
+    if(t.dk&&partnerData[t.dk]){
+      var cnt=partnerData[t.dk].length;
+      if(cnt){btn.textContent+=' ('+cnt+')';}
+    }
+    el.appendChild(btn);
+  });
+}
+
+function switchTab(key){
+  currentTab=key;
+  buildTabs();
+  renderTab();
+}
+
+// ── Render ─────────────────────────────────────────────────────
+function renderTab(){
+  var el=$('tabContent'); el.innerHTML='';
+  if(!partnerData) return;
+
+  var cp=partnerData.chargePoints||[];
+  var sess=partnerData.sessions||[];
+  var txns=partnerData.transactions||[];
+  var active=partnerData.activeSessions||[];
+  var locs=partnerData.locations||[];
+  var partner=partnerData.partner||{};
+  var ym=partnerData.month||getYM();
+  var mLabel=new Date(ym+'-15').toLocaleString('default',{month:'long',year:'numeric'});
+  var pname=partner.name||partner.companyName||'Partner';
+
+  if(currentTab==='overview'){
+    var cpOnline=cp.filter(function(c){return ['online','available','charging'].indexOf((c.connectivity_status||c.status||'').toLowerCase())>=0;}).length;
+    var cpFaulted=cp.filter(function(c){return (c.connectivity_status||c.status||'').toLowerCase()==='faulted';}).length;
+    var totalEnergy=sess.reduce(function(a,s){return a+parseFloat(s.energy||0);},0)/1000;
+    var totalRev=txns.reduce(function(a,t){return a+parseFloat(t.totalAmount||t.amount||0);},0);
+
+    // Partner info header
+    var info=document.createElement('div'); info.className='section';
+    info.innerHTML='<div class="stitle">🏢 '+pname+'</div>'
+      +'<div style="display:flex;gap:24px;flex-wrap:wrap;color:#8892a4;font-size:13px">'
+      +(partner.email?'<span>📧 '+partner.email+'</span>':'')
+      +(partner.phone?'<span>📞 '+partner.phone+'</span>':'')
+      +(partner.type?'<span>🏷️ '+partner.type+'</span>':'')
+      +(partner.status?'<span>Status: <strong style="color:#e2e8f0">'+partner.status+'</strong></span>':'')
+      +'</div>';
+    el.appendChild(info);
+
+    // KPI Cards
+    var cards=document.createElement('div'); cards.className='cards';
+    [
+      {icon:'🔌', label:'Charge Points',       value:cp.length,             color:'#00c2a8', sub:cpOnline+' online · '+cpFaulted+' faulted'},
+      {icon:'📍', label:'Locations',            value:locs.length,           color:'#3b82f6'},
+      {icon:'⚡', label:'Active Sessions',      value:active.length,         color:'#a78bfa'},
+      {icon:'📋', label:'Sessions '+mLabel,     value:sess.length,           color:'#06b6d4'},
+      {icon:'🔋', label:'Energy kWh '+mLabel,   value:totalEnergy.toFixed(1),color:'#f59e0b'},
+      {icon:'💰', label:'Revenue '+mLabel,       value:'$'+totalRev.toFixed(2),color:'#10b981'},
+    ].forEach(function(c){
+      var d=document.createElement('div'); d.className='card';
+      d.innerHTML='<div class="ci">'+c.icon+'</div><div class="cl">'+c.label+'</div>'
+        +'<div class="cv" style="color:'+c.color+'">'+c.value+'</div>'
+        +(c.sub?'<div class="cs">'+c.sub+'</div>':'');
+      cards.appendChild(d);
+    }); el.appendChild(cards);
+
+    // Active sessions
+    if(active.length){
+      var sec=document.createElement('div'); sec.className='section';
+      sec.innerHTML='<div class="stitle">⚡ Currently Charging</div>';
+      var rows=active.map(function(s,i){
+        return mkTRow([mkTd(s.id,'mono'),mkTd(s.chargePointId||'–','muted'),mkTd(fmt(s.startedAt),'muted'),mkTd((parseFloat(s.energy||0)/1000).toFixed(2))]);
+      });
+      sec.appendChild(mkTable(['Session','Charge Point','Started','kWh'],rows));
+      el.appendChild(sec);
+    }
+
+    // Charge point status breakdown
+    if(cp.length){
+      var statusCounts=cp.reduce(function(a,c){var s=c.connectivity_status||c.status||'unknown';a[s]=(a[s]||0)+1;return a;},{});
+      var sec=document.createElement('div'); sec.className='section';
+      sec.innerHTML='<div class="stitle">Charge Point Status</div>';
+      var grid=document.createElement('div'); grid.className='sgrid';
+      Object.keys(statusCounts).forEach(function(s){
+        var box=document.createElement('div'); box.className='sbox';
+        box.appendChild(mkBadge(s));
+        var num=document.createElement('div'); num.className='snum'; num.textContent=statusCounts[s];
+        box.appendChild(num); grid.appendChild(box);
+      });
+      sec.appendChild(grid); el.appendChild(sec);
+    }
+
+    // Top chargers by sessions
+    if(sess.length && cp.length){
+      var cpSess=sess.reduce(function(a,s){var id=s.chargePointId||s.charge_point_id;if(id){a[id]=(a[id]||0)+1;}return a;},{});
+      var top=Object.keys(cpSess).map(function(k){return [k,cpSess[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+      if(top.length){
+        var max=top[0][1];
+        var pw=document.createElement('div'); pw.className='pw';
+        pw.innerHTML='<div class="stitle">Top Chargers by Sessions — '+mLabel+'</div>';
+        top.forEach(function(entry){
+          var c=cp.filter(function(x){return String(x.id)===String(entry[0]);})[0];
+          var label=c?(n(c.name)||c.serial_number||'CP '+entry[0]):'CP '+entry[0];
+          var item=document.createElement('div'); item.className='pi';
+          var row=document.createElement('div'); row.className='pr';
+          var lbl=document.createElement('span'); lbl.textContent=label;
+          var val=document.createElement('span'); val.style.color='#8892a4'; val.textContent=entry[1]+' sessions';
+          row.appendChild(lbl); row.appendChild(val);
+          var track=document.createElement('div'); track.className='pt';
+          var fill=document.createElement('div'); fill.className='pf'; fill.style.width=Math.round(entry[1]/max*100)+'%';
+          track.appendChild(fill); item.appendChild(row); item.appendChild(track); pw.appendChild(item);
+        });
+        el.appendChild(pw);
+      }
+    }
+    return;
+  }
+
+  if(currentTab==='chargers'){
+    var rows=cp.map(function(c,i){
+      return mkTRow([mkTd(c.id,'mono'),mkTd(n(c.name)),mkTd(c.serial_number||'–','mono muted'),mkBdgTd(c.connectivity_status||c.status),mkTd(c.location_id||'–','muted'),mkTd(c.model||c.vendor||'–','muted')]);
+    });
+    el.appendChild(mkTable(['ID','Name','Serial','Status','Location','Model'],rows));
+    return;
+  }
+
+  if(currentTab==='sessions'){
+    var combined=active.concat(sess), seen={};
+    var deduped=combined.filter(function(s){if(seen[s.id])return false;seen[s.id]=true;return true;});
+    var note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px';
+    note.textContent='Showing '+mLabel+' sessions for '+pname; el.appendChild(note);
+    var rows=deduped.slice(0,500).map(function(s){
+      var dur=s.stoppedAt&&s.startedAt?Math.round((new Date(s.stoppedAt)-new Date(s.startedAt))/60000)+'m':'–';
+      return mkTRow([mkTd(s.id,'mono'),mkBdgTd(s.status),mkTd(fmt(s.startedAt),'muted'),mkTd((parseFloat(s.energy||0)/1000).toFixed(2)),mkTd(dur,'muted'),mkTd(s.chargePointId||'–','muted'),mkTd(money(s.amount),'green')]);
+    });
+    el.appendChild(mkTable(['ID','Status','Started','kWh','Duration','Charge Point','Amount'],rows));
+    return;
+  }
+
+  if(currentTab==='transactions'){
+    var note=document.createElement('div'); note.style.cssText='color:#8892a4;font-size:12px;margin-bottom:10px';
+    note.textContent='Showing '+mLabel+' transactions for '+pname; el.appendChild(note);
+    var rows=txns.slice(0,500).map(function(t){
+      return mkTRow([mkTd(t.id,'mono'),mkTd(t.sessionId||'–','mono muted'),mkTd(money(t.totalAmount||t.amount),'green'),mkTd(t.currency||'USD','muted'),mkBdgTd(t.status),mkTd(fmt(t.date||t.created_at),'muted')]);
+    });
+    el.appendChild(mkTable(['ID','Session','Amount','Currency','Status','Date'],rows));
+    return;
+  }
+
+  if(currentTab==='locations'){
+    if(!locs.length){var d=document.createElement('div');d.className='empty';d.textContent='No locations found for this partner';el.appendChild(d);return;}
+    var grid=document.createElement('div'); grid.className='section';
+    grid.innerHTML='<div class="stitle">Locations ('+locs.length+')</div>';
+    var g=document.createElement('div'); g.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px';
+    locs.forEach(function(l){
+      var c=document.createElement('div'); c.style.cssText='background:#0d1117;border-radius:10px;padding:14px';
+      c.innerHTML='<div style="font-weight:700;font-size:14px;margin-bottom:6px">📍 '+n(l.name)+'</div>'
+        +'<div style="color:#8892a4;font-size:12px">'+([n(l.address),l.city,l.region,l.country].filter(Boolean).join(', ')||'–')+'</div>'
+        +'<div style="color:#4b5563;font-size:11px;margin-top:4px">'+(l.external_id||'ID: '+l.id)+'</div>'
+        +(l.public_charge_points!=null?'<div style="color:#00c2a8;font-size:12px;margin-top:6px">🔌 '+l.public_charge_points+' public CPs</div>':'');
+      g.appendChild(c);
+    });
+    grid.appendChild(g); el.appendChild(grid);
+  }
+}
+
+// ── Table helpers ──────────────────────────────────────────────
+function mkTable(headers, rows){
+  var wrap=document.createElement('div'); wrap.className='tw';
+  var tbl=document.createElement('table');
+  var thead=document.createElement('thead'), hr=document.createElement('tr');
+  headers.forEach(function(h){var th=document.createElement('th');th.textContent=h;hr.appendChild(th);});
+  thead.appendChild(hr); tbl.appendChild(thead);
+  var tbody=document.createElement('tbody');
+  if(!rows||!rows.length){var tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=headers.length;td.className='empty';td.textContent='No data';tr.appendChild(td);tbody.appendChild(tr);}
+  else{rows.forEach(function(r){tbody.appendChild(r);});}
+  tbl.appendChild(tbody); wrap.appendChild(tbl); return wrap;
+}
+function mkTRow(cells){var tr=document.createElement('tr');cells.forEach(function(c){tr.appendChild(c);});return tr;}
+function mkTd(text,cls){var td=document.createElement('td');td.textContent=text||'–';if(cls)td.className=cls;return td;}
+function mkBdgTd(s){var td=document.createElement('td');td.appendChild(mkBadge(s));return td;}
+
+function showErr(msg){
+  $('loadEl').style.display='none';
+  $('errEl').textContent='⚠️ '+msg;
+  $('errEl').style.display='block';
+}
+
+// ── Start ──────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>    <select class="sel" id="partnerSel" onchange="onPartnerChange()" style="display:none">
+      <option value="">— Select Partner —</option>
+    </select>
+    <select class="sel" id="monthSel" onchange="onDataChange()" style="display:none"></select>
+    <button class="btn" id="refreshBtn" onclick="loadPartnerData()" style="display:none">🔄 Refresh</button>
+    <span class="bdg" id="badge" style="display:none">🟢 Live</span>
+  </div>
+</div>
+
+<div class="err" id="errEl" style="display:none"></div>
+
+<div class="spin-wrap" id="loadEl">
+  <div class="spin">⚡</div>
+  <div style="font-size:14px;margin-top:10px" id="loadMsg">Loading partners...</div>
+  <div style="font-size:12px;color:#4b5563;margin-top:4px" id="loadSub"></div>
+</div>
+
+<div class="welcome" id="welcomeEl" style="display:none">
+  <div style="font-size:48px;margin-bottom:14px">🏢</div>
+  <div style="font-weight:700;font-size:18px;margin-bottom:8px">Select a Partner</div>
+  <div style="color:#8892a4;font-size:14px">Choose a partner from the dropdown above to view their dashboard.</div>
+</div>
+
+<div id="dashEl" style="display:none">
+  <div class="tabs" id="tabsEl"></div>
+  <div id="tabContent"></div>
+</div>
+
+<script>
+var PROXY = '/api/ampeco';
+var SC = {available:'#00c2a8',charging:'#3b82f6',faulted:'#ef4444',unavailable:'#f59e0b',preparing:'#a78bfa',finishing:'#06b6d4',online:'#00c2a8',offline:'#8892a4',active:'#3b82f6',pending:'#f59e0b',finished:'#10b981',completed:'#10b981',unknown:'#8892a4'};
+
+var partners = [];
+var partnerData = null;
+var currentTab = 'overview';
+
+function $(id){ return document.getElementById(id); }
+function n(v){ if(!v)return '–'; if(typeof v==='string')return v; return v.en||v[Object.keys(v)[0]]||'–'; }
+function fmt(d){ return d?new Date(d).toLocaleString():'–'; }
+function money(v){ return (v!=null&&v!=='') ? '$'+parseFloat(v).toFixed(2) : '–'; }
+
+function mkBadge(s){
+  var k=(s||'unknown').toLowerCase(), c=SC[k]||'#8892a4';
+  var el=document.createElement('span'); el.className='bs';
+  el.style.cssText='background:'+c+'22;color:'+c+';border:1px solid '+c+'44';
+  el.textContent=s||'unknown'; return el;
+}
+
+// ── Fetch ──────────────────────────────────────────────────────
+async function getPages(path, max){
+  max = max||50;
+  var all=[], page=1, last=1;
+  do {
+    var sep = path.indexOf('?')>=0 ? '&' : '?';
+    var url = PROXY+'?path='+encodeURIComponent(path+sep+'per_page=100&page='+page);
+    var res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status+' for '+path);
+    var j = await res.json();
+    var items = j.data||j.items||(Array.isArray(j)?j:[]);
+    all = all.concat(items);
+    last = (j.meta&&j.meta.last_page)?j.meta.last_page:1;
+    $('loadSub').textContent = path.split('/').pop().split('?')[0]+' — page '+page+' of '+Math.min(last,max);
+    page++;
+  } while(page<=last && page<=max);
+  return all;
+}
+
+// ── Month helpers ──────────────────────────────────────────────
+function curYM(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function getYM(){ return $('monthSel').value||curYM(); }
+function monthRange(ym){
+  var p=ym.split('-'), y=parseInt(p[0]), m=parseInt(p[1]);
+  return {from:ym+'-01', to:ym+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0')};
+}
+function buildMonthOptions(){
+  var sel=$('monthSel'); sel.innerHTML='';
+  var now=new Date();
+  for(var i=0;i<12;i++){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var opt=document.createElement('option');
+    opt.value=ym;
+    opt.textContent=d.toLocaleString('default',{month:'long',year:'numeric'});
+    if(i===0)opt.selected=true;
+    sel.appendChild(opt);
+  }
+}
+
+// ── Init: load partners ────────────────────────────────────────
+async function init(){
+  try {
+    $('loadMsg').textContent = 'Loading partners...';
+    partners = await getPages('/resources/partners/v2.0', 20);
+    if(!partners.length){
+      showErr('No partners found in this account.');
+      return;
+    }
+
+    // Populate partner dropdown
+    var sel = $('partnerSel');
+    sel.innerHTML = '<option value="">— Select Partner —</option>';
+    partners.forEach(function(p){
+      var opt=document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name||p.companyName||('Partner '+p.id);
+      sel.appendChild(opt);
+    });
+
+    buildMonthOptions();
+    $('partnerSel').style.display = '';
+    $('monthSel').style.display = '';
+    $('loadEl').style.display = 'none';
+    $('welcomeEl').style.display = 'block';
+  } catch(e){
+    showErr('Failed to load partners: '+e.message);
+  }
+}
+
+function onPartnerChange(){
+  var pid = $('partnerSel').value;
+  if(!pid){ $('dashEl').style.display='none'; $('welcomeEl').style.display='block'; return; }
+  loadPartnerData();
+}
+
+function onDataChange(){
+  if($('partnerSel').value) loadPartnerData();
+}
+
+// ── Load partner-specific data ────────────────────────────────
+async function loadPartnerData(){
+  var pid = $('partnerSel').value;
+  if(!pid) return;
+
+  var partner = partners.filter(function(p){return String(p.id)===String(pid);})[0];
+  var pname = partner ? (partner.name||partner.companyName||'Partner '+pid) : 'Partner '+pid;
+  var ym = getYM();
+  var range = monthRange(ym);
+
+  $('welcomeEl').style.display = 'none';
+  $('dashEl').style.display = 'none';
+  $('loadEl').style.display = 'block';
+  $('refreshBtn').style.display = 'none';
+  $('badge').style.display = 'none';
+  $('errEl').style.display = 'none';
+
+  try {
+    $('loadMsg').textContent = 'Loading data for '+pname+'...';
+
+    // Fetch charge points for this partner
+    var chargePoints = await getPages('/resources/charge-points/v1.0?filter[partnerId]='+pid, 50);
+
     // Get charge point IDs for filtering sessions
     var cpIds = chargePoints.map(function(cp){ return cp.id; });
 
