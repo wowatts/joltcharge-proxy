@@ -312,7 +312,7 @@ async function loadMonth(forceRefresh){
   showProg('Loading charger stats');
 
   try {
-    var result=await fetchAllStats(ym, range, null);
+    var result = await fetchAllStats(ym, range);
     saveCache(partnerId, ym, result);
     pageData=result;
     $('loadEl').style.display='none';
