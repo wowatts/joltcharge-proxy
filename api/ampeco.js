@@ -34,30 +34,41 @@ module.exports = async function handler(req, res) {
       const firstJson = await firstRes.json();
       const lastPage = firstJson.meta?.last_page || 1;
 
-      // Fetch last 10 pages in parallel (~1000 most recent sessions across network)
-      const numPages = Math.min(10, lastPage);
+      // Fetch last 50 pages in parallel batches of 10
+      // 50 pages = 5000 most recent sessions across network
+      const numPages = Math.min(50, lastPage);
       const pageNums = [];
       for (let i = 0; i < numPages; i++) {
         const p = lastPage - i;
         if (p >= 1) pageNums.push(p);
       }
 
-      const results = await Promise.all(
-        pageNums.map(p =>
-          fetch(`${BASE}${sessionPath}?per_page=100&page=${p}`, { headers })
-            .then(r => r.ok ? r.json() : { data: [] })
-            .catch(() => ({ data: [] }))
-        )
-      );
-
+      // Fetch in batches of 10 to avoid overwhelming the upstream API
       const matched = [];
-      for (const r of results) {
-        for (const item of (r.data || [])) {
-          const d    = new Date(item.startedAt || item.date || 0);
-          const cpId = item.chargePointId || item.charge_point_id;
-          if (d >= from && d <= to && cpIdSet.has(Number(cpId))) {
-            matched.push(item);
+      for (let b = 0; b < pageNums.length; b += 10) {
+        const batch = pageNums.slice(b, b + 10);
+        const results = await Promise.all(
+          batch.map(p =>
+            fetch(`${BASE}${sessionPath}?per_page=100&page=${p}`, { headers })
+              .then(r => r.ok ? r.json() : { data: [] })
+              .catch(() => ({ data: [] }))
+          )
+        );
+        for (const r of results) {
+          for (const item of (r.data || [])) {
+            const d    = new Date(item.startedAt || item.date || 0);
+            const cpId = item.chargePointId || item.charge_point_id;
+            if (d >= from && d <= to && cpIdSet.has(Number(cpId))) {
+              matched.push(item);
+            }
           }
+        }
+        // Early exit: if oldest item on this batch is before dateFrom, stop
+        const lastBatch = results[results.length - 1];
+        const lastItems = lastBatch?.data || [];
+        if (lastItems.length > 0) {
+          const oldestDate = new Date(lastItems[0].startedAt || 0);
+          if (oldestDate < from) break;
         }
       }
 
