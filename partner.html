@@ -222,7 +222,7 @@ async function fetchCPStats(cpId, from, to){
 // Active sessions for one CP
 async function fetchCPActive(cpId){
   var last24=new Date(Date.now()-24*3600000).toISOString().slice(0,10);
-  var path='/resources/sessions/v1.0?filter[chargePointId]='+cpId+'&filter[startedAt][from]='+last24;
+  var path='/resources/sessions/v1.0?filter[charge_point_id]='+cpId+'&filter[startedAt][from]='+last24;
   var sessions=await getPages(path,2);
   return sessions.filter(function(s){return s.status==='active'||s.status==='pending';});
 }
