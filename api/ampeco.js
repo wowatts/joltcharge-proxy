@@ -1,5 +1,3 @@
-
-// api/ampeco.js
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -8,7 +6,7 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const { path, ...query } = req.query;
+  const { path, ...rest } = req.query;
   if (!path) return res.status(400).json({ error: "Missing ?path= parameter" });
 
   const AMPECO_KEY  = process.env.AMPECO_API_KEY;
@@ -18,9 +16,12 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "Missing env var: AMPECO_API_KEY" });
   }
 
-  const qs = new URLSearchParams(query).toString();
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${AMPECO_BASE}${normalizedPath}${qs ? "?" + qs : ""}`;
+  // Build the upstream URL:
+  // - `path` contains the API path and any filters already encoded in it
+  // - `rest` contains additional query params (per_page, page) passed separately
+  const extraParams = new URLSearchParams(rest).toString();
+  const separator = path.includes("?") ? "&" : "?";
+  const url = `${AMPECO_BASE}${path}${extraParams ? separator + extraParams : ""}`;
 
   try {
     const upstream = await fetch(url, {
