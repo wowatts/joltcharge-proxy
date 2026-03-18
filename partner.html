@@ -249,9 +249,12 @@ async function loadData(preloadedCPs){
   $('badge').style.display='none';
   $('refreshBtn').disabled=true;
   $('dataErr').style.display='none';
-  $('tabContent').innerHTML='<div class="spin-wrap"><div class="spin" style="font-size:28px">⚡</div><div class="step" id="loadStep" style="margin-top:10px">Starting...</div></div>';
+  $('tabContent').innerHTML='';
+  $('loadEl').style.display='block';
+  $('loadMsg').textContent='Loading data...';
+  $('loadStep').innerHTML='';
 
-  function s(msg){ var el=$('loadStep'); if(el) el.innerHTML=msg; }
+  function s(msg){ $('loadStep').innerHTML=msg; }
 
   try {
     // 1. Charge points (reuse if preloaded)
@@ -294,12 +297,14 @@ async function loadData(preloadedCPs){
 
     pageData={chargePoints:chargePoints,locations:locations,sessions:sessions,activeSessions:activeSessions,transactions:transactions,month:ym};
 
+    $('loadEl').style.display='none';
     $('badge').style.display='';
     $('refreshBtn').disabled=false;
     buildTabs();
     switchTab(currentTab);
 
   } catch(e){
+    $('loadEl').style.display='none';
     $('dataErr').textContent='⚠️ '+e.message;
     $('dataErr').style.display='block';
     $('tabContent').innerHTML='';
